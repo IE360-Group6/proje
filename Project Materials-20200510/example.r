@@ -116,6 +116,7 @@ password = p_word
 
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
+
 library(forecast)
 library(ggplot2)
 library(zoo)
