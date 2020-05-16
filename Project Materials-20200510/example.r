@@ -142,5 +142,5 @@ ggplot(filtered_data,aes(x=filtered_data$dates,y=filtered_data$sold_count))+geom
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=2.3]
 
-send_submission(predictions, token, url=subm_url, submit_now=F)
+send_submission(predictions, token, url=subm_url, submit_now=T)
     
