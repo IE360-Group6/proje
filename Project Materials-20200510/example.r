@@ -137,10 +137,10 @@ autoplot(fc)
 
 ggplot(filtered_data,aes(x=filtered_data$dates,y=filtered_data$sold_count))+geom_point()
 
-#mrhb
 
+#forecastte tarih bir önceki günün tarihine esitlenip run alinacak
 predictions=unique(data[,list(product_content_id)])
-predictions[,forecast:=2.3]
+predictions[,forecast:=data[event_date=="2020-05-15"]$sold_count]
 
-send_submission(predictions, token, url=subm_url, submit_now=T)
+send_submission(predictions, token, url=subm_url, submit_now=F)
     
