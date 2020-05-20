@@ -120,7 +120,7 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 
-dates <- seq(as.Date("2019-04-30"), length = 382, by = "days")
+dates <- seq(as.Date("2019-04-30"), length = 385, by = "days")
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -150,13 +150,14 @@ mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$pric
 checkresiduals(mont_sold)
 yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$price), h = 2)
 autoplot(yarin_mont)
-fc <- c(fc, yarin_mont$mean[1])
+fc <- c(fc, as.numeric(mont$sold_count[385]))
 
+#model sikintili
 mendil_sold <- auto.arima(as.numeric(mendil$sold_count), xreg = as.numeric(mendil$price))
 checkresiduals(mendil_sold)
 yarin_mendil <- forecast(mendil_sold, xreg = as.numeric(mendil$price), h = 2)
 autoplot(yarin_mendil)
-fc <- c(fc, yarin_mendil$mean[1])
+fc <- c(fc, as.numeric(mendil$sold_count[385]))
 
 bikini_sold <- auto.arima(as.numeric(bikini$sold_count), xreg = as.numeric(bikini$price))
 checkresiduals(bikini_sold)
@@ -186,5 +187,5 @@ fc <- c(fc, yarin_yuztemizleyici$mean[1])
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=fc]
 
-send_submission(predictions, token, url=subm_url, submit_now=F)
+send_submission(predictions, token, url=subm_url, submit_now=T)
     
