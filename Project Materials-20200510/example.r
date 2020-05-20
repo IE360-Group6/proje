@@ -119,8 +119,8 @@ password = p_word
 
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
-
-dates <- seq(as.Date("2019-04-30"), length = 385, by = "days")
+data_temiz <- data[product_content_id==32939029 & basket_count>-1]
+dates <- seq(as.Date("2019-04-30"), length = 386, by = "days")
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -133,35 +133,51 @@ yuztemizleyici <- xts(data[product_content_id==85004],order.by=dates)
 #autoplot(tayt, facets = TRUE)
 #as.numeric(tayt[,"category_sold"])
 
+#price elasticity
+#tayt_price_vector <- log(as.numeric(tayt$price>0))
+#tayt_sold_vector <- log(as.numeric(tayt$price>0))
+#tayt_price_elast <- data.frame(log(tayt_sold_vector),log(tayt_price_vector))
+#colnames(tayt_price_elast) <- c("log_sales","log_price")
+#tayt_price_elasticity <- lm("log_sales","log_price",data=tayt_price_elast)
+
 #arima model, error test, yarin icin forecast
 tayt_sold <- auto.arima(as.numeric(tayt$sold_count), xreg = as.numeric(tayt$price))
 checkresiduals(tayt_sold)
 yarin_tayt <- forecast(tayt_sold, xreg = as.numeric(tayt$price), h = 2)
 autoplot(yarin_tayt)
+yarin_tayt$mean
 fc <- c(yarin_tayt$mean[1])
 
-disfirca_sold <- auto.arima(as.numeric(disfirca$sold_count), xreg = as.numeric(disfirca$price))
+#residual iyi model,5ten sonrasi daha iyi tahmin oluyor
+disfirca_sold <- auto.arima(as.numeric(disfirca$sold_count), xreg = as.numeric(disfirca$basket_count))
 checkresiduals(disfirca_sold)
-yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca$price), h = 2)
+yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca$basket_count), h = 2)
 autoplot(yarin_disfirca)
-fc <- c(fc, yarin_disfirca$mean[1])
+yarin_disfirca$mean
+fc <- c(fc, yarin_disfirca$mean[5])
 
-mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$price))
+#bu mevsim mont satilmaz forecast seasonal effect almasa da mantikli forecast veriyor onumuz icin
+mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$ty_visits))
 checkresiduals(mont_sold)
-yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$price), h = 2)
+yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$ty_visits), h = 2)
 autoplot(yarin_mont)
-fc <- c(fc, as.numeric(mont$sold_count[385]))
+yarin_mont$mean
+fc <- c(fc, as.numeric(mont$sold_count[386]))
 
-#model sikintili
-mendil_sold <- auto.arima(as.numeric(mendil$sold_count), xreg = as.numeric(mendil$price))
+#model sacma tahmin veriyor,en mantiklisi verinin basladigi(-1 siz) tarihden itibaren xts alindi 
+mendil_available <- window(mendil,start="2019-09-09")
+mendil_sold <- auto.arima(as.numeric(mendil_available$sold_count), xreg = as.numeric(mendil_available$price))
 checkresiduals(mendil_sold)
-yarin_mendil <- forecast(mendil_sold, xreg = as.numeric(mendil$price), h = 2)
+yarin_mendil <- forecast(mendil_sold, xreg = as.numeric(mendil_available$price), h = 2)
 autoplot(yarin_mendil)
-fc <- c(fc, as.numeric(mendil$sold_count[385]))
+yarin_mendil$mean
+fc <- c(fc,yarin_mendil$mean[1] )
 
+#seasonality effect visit_countta daha iyi ama neagtif veriyor price birakildi
 bikini_sold <- auto.arima(as.numeric(bikini$sold_count), xreg = as.numeric(bikini$price))
 checkresiduals(bikini_sold)
 yarin_bikini <- forecast(bikini_sold, xreg = as.numeric(bikini$price), h = 2)
+yarin_bikini$mean
 autoplot(yarin_bikini)
 fc <- c(fc, yarin_bikini$mean[1])
 
@@ -169,6 +185,7 @@ kulaklik_sold <- auto.arima(as.numeric(kulaklik$sold_count), xreg = as.numeric(k
 checkresiduals(kulaklik_sold)
 yarin_kulaklik <- forecast(kulaklik_sold, xreg = as.numeric(kulaklik$price), h = 2)
 autoplot(yarin_kulaklik)
+yarin_kulaklik$mean
 fc <- c(fc, yarin_kulaklik$mean[1])
 
 supurge_sold <- auto.arima(as.numeric(supurge$sold_count), xreg = as.numeric(supurge$price))
@@ -187,5 +204,5 @@ fc <- c(fc, yarin_yuztemizleyici$mean[1])
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=fc]
 
-send_submission(predictions, token, url=subm_url, submit_now=T)
+send_submission(predictions, token, url=subm_url, submit_now=F)
     
