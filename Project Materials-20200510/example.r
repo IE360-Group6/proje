@@ -119,8 +119,8 @@ password = p_word
 
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
-data_temiz <- data[product_content_id==32939029 & basket_count>-1]
-dates <- seq(as.Date("2019-04-30"), length = 386, by = "days")
+#data_temiz <- data[product_content_id==32939029 & basket_count>-1]
+dates <- seq(as.Date("2019-04-30"), length = 387, by = "days")
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -141,20 +141,45 @@ yuztemizleyici <- xts(data[product_content_id==85004],order.by=dates)
 #tayt_price_elasticity <- lm("log_sales","log_price",data=tayt_price_elast)
 
 #arima model, error test, yarin icin forecast
-tayt_sold <- auto.arima(as.numeric(tayt$sold_count), xreg = as.numeric(tayt$price))
-checkresiduals(tayt_sold)
-yarin_tayt <- forecast(tayt_sold, xreg = as.numeric(tayt$price), h = 2)
-autoplot(yarin_tayt)
+
+tayt_basket_psu <- window(tayt,start="2019-11-21")
+tayt_duzgun_basket <- tayt_basket_psu [,"basket_count">0]
+tayt_sold_psu <- window(tayt,start="2019-11-20",end="2020-05-19")
+tayt_duzgun_sold <- tayt_sold_psu [,"basket_count">0]
+#tayt_sold <- auto.arima(as.numeric(tayt_duzgun_sold$sold_count), xreg = as.numeric(tayt_duzgun_basket$basket_count))
+#checkresiduals(tayt_sold)
+#yarin_tayt <- forecast(tayt_sold, xreg = as.numeric(tayt_duzgun_basket$basket_count), h = 2)
+tayt_son<-tayt_basket_psu[-179]
+tayt_sonn <- tayt_son[as.numeric(tayt_son$price)>0]
+yarin_tayt_visit<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$visit_count)),xreg=as.numeric(tayt_sonn$visit_count))
+checkresiduals(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$visit_count)))
+autoplot(yarin_tayt_visit)
+
+#yarin_tayt_fave<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$favored_count)),xreg=as.numeric(tayt_sonn$favored_count))
+#checkresiduals(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$favored_count)))
+#autoplot(yarin_tayt_fave)
+
+summary(yarin_tayt_visit)
+summary(yarin_tayt_fave)
 yarin_tayt$mean
-fc <- c(yarin_tayt$mean[1])
+fc <- c(yarin_tayt_visit$mean[1])
+
 
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
-disfirca_sold <- auto.arima(as.numeric(disfirca$sold_count), xreg = as.numeric(disfirca$basket_count))
+disfirca_baslangic<- window(disfirca,start="2019-11-21")
+df <- disfirca_baslangic[as.numeric(disfirca_baslangic$price)>0]
+disfirca_baslangic[,as.numeric("price") == -1.00]$price <- mean(df)
+
+#disfirca_baslangic_train<- window(disfirca,start="2019-11-21",end="2020-03-20")
+#disfirca_baslangic_test<-window(disfirca,start="2020-03-21")
+disfirca_sold <- auto.arima(as.numeric(disfirca_baslangic$sold_count), xreg = as.numeric(disfirca_baslangic$visit_count))
 checkresiduals(disfirca_sold)
-yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca$basket_count), h = 2)
+yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca_baslangic$visit_count), h = 2)
+accuracy(yarin_disfirca,disfirca_baslangic_train)
 autoplot(yarin_disfirca)
 yarin_disfirca$mean
 fc <- c(fc, yarin_disfirca$mean[5])
+autoplot(forecast(tbats(disfirca_baslangic[,"sold_count"])))
 
 #bu mevsim mont satilmaz forecast seasonal effect almasa da mantikli forecast veriyor onumuz icin
 mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$ty_visits))
