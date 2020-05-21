@@ -153,9 +153,7 @@ tayt_son<-tayt_basket_psu[-179]
 tayt_sonn <- tayt_son[as.numeric(tayt_son$price)>0]
 yarin_tayt_visit<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$visit_count)),xreg=as.numeric(tayt_sonn$visit_count))
 checkresiduals(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$visit_count)))
-autoplot(yarin_tayt_visit)
-
-#yarin_tayt_fave<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$favored_count)),xreg=as.numeric(tayt_sonn$favored_count))
+autoplot(yariave<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$favored_count)),xreg=as.numeric(tayt_sonn$favored_count)))
 #checkresiduals(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.numeric(tayt_sonn$favored_count)))
 #autoplot(yarin_tayt_fave)
 
@@ -164,7 +162,9 @@ summary(yarin_tayt_fave)
 yarin_tayt$mean
 fc <- c(yarin_tayt_visit$mean[1])
 
+n_tayt_visit
 
+#yarin_tayt_f
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
 disfirca_baslangic<- window(disfirca,start="2019-11-21")
 df <- disfirca_baslangic[as.numeric(disfirca_baslangic$price)>0]
