@@ -117,19 +117,28 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 
+colnames(data)
+str(data)
+setnames(data,old = "event_date",new = "Date")
+str(data)
+data[,Date:=as.POSIXct(data$Date, format = '%d.%m.%Y')]
+
+
+
 library(forecast)
 library(ggplot2)
 library(zoo)
 library(xts)
 
-?subset
 str(data)
 data$event_date=as.Date(data$event_date)
-filtered_data<-data[product_content_id == 32939029]
-filtered_data<-filtered_data[event_date >= "2019-04-30"]
-filtered_data[,dates:=as.Date(event_date)]
-disfircasi<-xts(filtered_data$sold_count,order.by = filtered_data$dates)
-disfircasi2<-xts(filtered_data$category_sold,order.by = filtered_data$dates)
+disfircasi_data<-data[product_content_id == 32939029]
+disfircasi_data<-disfircasi_data[event_date >= "2019-04-30"]
+disfircasi_data[,dates:=as.Date(event_date)]
+disfircasi_xts<-xts(disfircasi_data,order.by = disfircasi_data$dates)
+
+
+
 auto.arima(disfircasi)
 fit_disfircasi<-auto.arima(disfircasi,xreg = disfircasi2)
 fc<-forecast(fit_disfircasi,xreg = disfircasi2)
@@ -138,9 +147,9 @@ autoplot(fc)
 ggplot(filtered_data,aes(x=filtered_data$dates,y=filtered_data$sold_count))+geom_point()
 
 
-#forecastte tarih bir önceki günün tarihine esitlenip run alinacak
+#forecastte tarih bir ?nceki g?n?n tarihine esitlenip run alinacak
 predictions=unique(data[,list(product_content_id)])
-predictions[,forecast:=data[event_date=="2020-05-15"]$sold_count]
+predictions[,forecast:=data[event_date=="2020-05-09"]$sold_count]
 
 send_submission(predictions, token, url=subm_url, submit_now=F)
     
