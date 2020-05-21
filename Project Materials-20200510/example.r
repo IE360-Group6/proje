@@ -2,6 +2,9 @@
 require(jsonlite)
 require(httr)
 require(data.table)
+require(xts)
+require(forecast)
+require(ggplot2)
 
 get_token <- function(username, password, url_site){
     
@@ -117,6 +120,7 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 
+<<<<<<< HEAD
 colnames(data)
 str(data)
 setnames(data,old = "event_date",new = "Date")
@@ -150,6 +154,73 @@ ggplot(filtered_data,aes(x=filtered_data$dates,y=filtered_data$sold_count))+geom
 #forecastte tarih bir ?nceki g?n?n tarihine esitlenip run alinacak
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=data[event_date=="2020-05-09"]$sold_count]
+=======
+dates <- seq(as.Date("2019-04-30"), length = 382, by = "days")
+tayt <- xts(data[product_content_id==31515569],order.by=dates)
+disfirca <- xts(data[product_content_id==32939029],order.by=dates)
+mont <- xts(data[product_content_id==3904356],order.by=dates)
+mendil <- xts(data[product_content_id==4066298],order.by=dates)
+bikini <- xts(data[product_content_id==5926527],order.by=dates)
+kulaklik <- xts(data[product_content_id==6676673],order.by=dates)
+supurge <- xts(data[product_content_id==7061886],order.by=dates)
+yuztemizleyici <- xts(data[product_content_id==85004],order.by=dates)
+
+#autoplot(tayt, facets = TRUE)
+#as.numeric(tayt[,"category_sold"])
+
+#arima model, error test, yarin icin forecast
+tayt_sold <- auto.arima(as.numeric(tayt$sold_count), xreg = as.numeric(tayt$price))
+checkresiduals(tayt_sold)
+yarin_tayt <- forecast(tayt_sold, xreg = as.numeric(tayt$price), h = 2)
+autoplot(yarin_tayt)
+fc <- c(yarin_tayt$mean[1])
+
+disfirca_sold <- auto.arima(as.numeric(disfirca$sold_count), xreg = as.numeric(disfirca$price))
+checkresiduals(disfirca_sold)
+yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca$price), h = 2)
+autoplot(yarin_disfirca)
+fc <- c(fc, yarin_disfirca$mean[1])
+
+mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$price))
+checkresiduals(mont_sold)
+yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$price), h = 2)
+autoplot(yarin_mont)
+fc <- c(fc, yarin_mont$mean[1])
+
+mendil_sold <- auto.arima(as.numeric(mendil$sold_count), xreg = as.numeric(mendil$price))
+checkresiduals(mendil_sold)
+yarin_mendil <- forecast(mendil_sold, xreg = as.numeric(mendil$price), h = 2)
+autoplot(yarin_mendil)
+fc <- c(fc, yarin_mendil$mean[1])
+
+bikini_sold <- auto.arima(as.numeric(bikini$sold_count), xreg = as.numeric(bikini$price))
+checkresiduals(bikini_sold)
+yarin_bikini <- forecast(bikini_sold, xreg = as.numeric(bikini$price), h = 2)
+autoplot(yarin_bikini)
+fc <- c(fc, yarin_bikini$mean[1])
+
+kulaklik_sold <- auto.arima(as.numeric(kulaklik$sold_count), xreg = as.numeric(kulaklik$price))
+checkresiduals(kulaklik_sold)
+yarin_kulaklik <- forecast(kulaklik_sold, xreg = as.numeric(kulaklik$price), h = 2)
+autoplot(yarin_kulaklik)
+fc <- c(fc, yarin_kulaklik$mean[1])
+
+supurge_sold <- auto.arima(as.numeric(supurge$sold_count), xreg = as.numeric(supurge$price))
+checkresiduals(supurge_sold)
+yarin_supurge <- forecast(supurge_sold, xreg = as.numeric(supurge$price), h = 2)
+autoplot(yarin_supurge)
+fc <- c(fc, yarin_supurge$mean[1])
+
+yuztemizleyici_sold <- auto.arima(as.numeric(yuztemizleyici$sold_count), xreg = as.numeric(yuztemizleyici$price))
+checkresiduals(yuztemizleyici_sold)
+yarin_yuztemizleyici <- forecast(yuztemizleyici_sold, xreg = as.numeric(yuztemizleyici$price), h = 2)
+autoplot(yarin_yuztemizleyici)
+fc <- c(fc, yarin_yuztemizleyici$mean[1])
+
+
+predictions=unique(data[,list(product_content_id)])
+predictions[,forecast:=fc]
+>>>>>>> a25f9803fc54d4bb702bd923f95fcc320ba22aa1
 
 send_submission(predictions, token, url=subm_url, submit_now=F)
     
