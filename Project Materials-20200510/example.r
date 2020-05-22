@@ -162,7 +162,6 @@ summary(yarin_tayt_fave)
 yarin_tayt$mean
 fc <- c(yarin_tayt_visit$mean[1])
 
-n_tayt_visit
 
 #yarin_tayt_f
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
@@ -175,11 +174,11 @@ disfirca_baslangic[,as.numeric("price") == -1.00]$price <- mean(df)
 disfirca_sold <- auto.arima(as.numeric(disfirca_baslangic$sold_count), xreg = as.numeric(disfirca_baslangic$visit_count))
 checkresiduals(disfirca_sold)
 yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca_baslangic$visit_count), h = 2)
-accuracy(yarin_disfirca,disfirca_baslangic_train)
+#accuracy(yarin_disfirca,disfirca_baslangic_train)
 autoplot(yarin_disfirca)
 yarin_disfirca$mean
 fc <- c(fc, yarin_disfirca$mean[5])
-autoplot(forecast(tbats(disfirca_baslangic[,"sold_count"])))
+#autoplot(forecast(tbats(disfirca_baslangic[,"sold_count"])))
 
 #bu mevsim mont satilmaz forecast seasonal effect almasa da mantikli forecast veriyor onumuz icin
 mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$ty_visits))
@@ -229,5 +228,5 @@ fc <- c(fc, yarin_yuztemizleyici$mean[1])
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=fc]
 
-send_submission(predictions, token, url=subm_url, submit_now=F)
+send_submission(predictions, token, url=subm_url, submit_now=T)
     
