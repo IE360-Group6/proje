@@ -120,7 +120,7 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 #data_temiz <- data[product_content_id==32939029 & basket_count>-1]
-dates <- seq(as.Date("2019-04-30"), length = 387, by = "days")
+dates <- seq(as.Date("2019-04-30"), length = 389, by = "days")
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -158,27 +158,41 @@ autoplot(yariave<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.n
 #autoplot(yarin_tayt_fave)
 
 summary(yarin_tayt_visit)
-summary(yarin_tayt_fave)
+#summary(yarin_tayt_fave)
 yarin_tayt$mean
-fc <- c(yarin_tayt_visit$mean[1])
+fc <- c(yarin_tayt_visit$mean[4])
 
 
 #yarin_tayt_f
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
 disfirca_baslangic<- window(disfirca,start="2019-11-21")
+View(disfirca_baslangic)
 df <- disfirca_baslangic[as.numeric(disfirca_baslangic$price)>0]
-disfirca_baslangic[,as.numeric("price") == -1.00]$price <- mean(df)
+
+
 
 #disfirca_baslangic_train<- window(disfirca,start="2019-11-21",end="2020-03-20")
 #disfirca_baslangic_test<-window(disfirca,start="2020-03-21")
 disfirca_sold <- auto.arima(as.numeric(disfirca_baslangic$sold_count), xreg = as.numeric(disfirca_baslangic$visit_count))
 checkresiduals(disfirca_sold)
 yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(disfirca_baslangic$visit_count), h = 2)
+
 #accuracy(yarin_disfirca,disfirca_baslangic_train)
 autoplot(yarin_disfirca)
 yarin_disfirca$mean
 fc <- c(fc, yarin_disfirca$mean[5])
 #autoplot(forecast(tbats(disfirca_baslangic[,"sold_count"])))
+
+
+disfirca_sold <- auto.arima(as.numeric(df$sold_count), xreg = as.numeric(df$favored_count))
+checkresiduals(disfirca_sold)
+yarin_disfirca <- forecast(disfirca_sold, xreg = as.numeric(df$favored_count), h = 2) 
+ 
+autoplot(yarin_disfirca)
+yarin_disfirca$mean
+#$fc <- c(fc, yarin_disfirca$mean[5])
+
+
 
 #bu mevsim mont satilmaz forecast seasonal effect almasa da mantikli forecast veriyor onumuz icin
 mont_sold <- auto.arima(as.numeric(mont$sold_count), xreg = as.numeric(mont$ty_visits))
@@ -186,7 +200,7 @@ checkresiduals(mont_sold)
 yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$ty_visits), h = 2)
 autoplot(yarin_mont)
 yarin_mont$mean
-fc <- c(fc, as.numeric(mont$sold_count[386]))
+fc <- c(fc, as.numeric(mont$sold_count[389]))
 
 #model sacma tahmin veriyor,en mantiklisi verinin basladigi(-1 siz) tarihden itibaren xts alindi 
 mendil_available <- window(mendil,start="2019-09-09")
@@ -203,7 +217,7 @@ checkresiduals(bikini_sold)
 yarin_bikini <- forecast(bikini_sold, xreg = as.numeric(bikini$price), h = 2)
 yarin_bikini$mean
 autoplot(yarin_bikini)
-fc <- c(fc, yarin_bikini$mean[1])
+fc <- c(fc, yarin_bikini$mean[7])
 
 kulaklik_sold <- auto.arima(as.numeric(kulaklik$sold_count), xreg = as.numeric(kulaklik$price))
 checkresiduals(kulaklik_sold)
@@ -227,6 +241,7 @@ fc <- c(fc, yarin_yuztemizleyici$mean[1])
 
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=fc]
+
 
 send_submission(predictions, token, url=subm_url, submit_now=T)
     
