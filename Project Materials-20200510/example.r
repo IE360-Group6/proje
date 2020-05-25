@@ -120,7 +120,7 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 #data_temiz <- data[product_content_id==32939029 & basket_count>-1]
-dates <- seq(as.Date("2019-04-30"), length = 389, by = "days")
+dates <- seq(as.Date("2019-04-30"), length = nrow(data), by = "days")
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -159,7 +159,7 @@ autoplot(yariave<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.n
 
 summary(yarin_tayt_visit)
 #summary(yarin_tayt_fave)
-yarin_tayt$mean
+#yarin_tayt$mean
 fc <- c(yarin_tayt_visit$mean[4])
 
 
@@ -200,7 +200,7 @@ checkresiduals(mont_sold)
 yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$ty_visits), h = 2)
 autoplot(yarin_mont)
 yarin_mont$mean
-fc <- c(fc, as.numeric(mont$sold_count[389]))
+fc <- c(fc, as.numeric(mont$sold_count[nrow(mont)]))
 
 #model sacma tahmin veriyor,en mantiklisi verinin basladigi(-1 siz) tarihden itibaren xts alindi 
 mendil_available <- window(mendil,start="2019-09-09")
@@ -209,7 +209,7 @@ checkresiduals(mendil_sold)
 yarin_mendil <- forecast(mendil_sold, xreg = as.numeric(mendil_available$price), h = 2)
 autoplot(yarin_mendil)
 yarin_mendil$mean
-fc <- c(fc,yarin_mendil$mean[1] )
+fc <- c(fc,yarin_mendil$mean[1])
 
 #seasonality effect visit_countta daha iyi ama neagtif veriyor price birakildi
 bikini_sold <- auto.arima(as.numeric(bikini$sold_count), xreg = as.numeric(bikini$price))
@@ -230,7 +230,7 @@ supurge_sold <- auto.arima(as.numeric(supurge$sold_count), xreg = as.numeric(sup
 checkresiduals(supurge_sold)
 yarin_supurge <- forecast(supurge_sold, xreg = as.numeric(supurge$price), h = 2)
 autoplot(yarin_supurge)
-fc <- c(fc, yarin_supurge$mean[1])
+fc <- c(fc, yarin_supurge$lower[1])
 
 yuztemizleyici_sold <- auto.arima(as.numeric(yuztemizleyici$sold_count), xreg = as.numeric(yuztemizleyici$price))
 checkresiduals(yuztemizleyici_sold)
