@@ -120,7 +120,7 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 #data_temiz <- data[product_content_id==32939029 & basket_count>-1]
-dates <- seq(as.Date("2019-04-30"), length = nrow(data), by = "days")
+dates <- seq(as.Date("2019-04-30"), length = uniqueN(data$event_date), by = "days")
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -166,7 +166,7 @@ fc <- c(yarin_tayt_visit$mean[4])
 #yarin_tayt_f
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
 disfirca_baslangic<- window(disfirca,start="2019-11-21")
-View(disfirca_baslangic)
+#View(disfirca_baslangic)
 df <- disfirca_baslangic[as.numeric(disfirca_baslangic$price)>0]
 
 
