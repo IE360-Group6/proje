@@ -120,11 +120,9 @@ password = p_word
 token = get_token(username=u_name, password=p_word, url=subm_url)
 data = get_data(token=token,url=subm_url)
 #data_temiz <- data[product_content_id==32939029 & basket_count>-1]
-<<<<<<< Updated upstream
-dates <- seq(as.Date("2019-04-30"), length = nrow(data), by = "days")
-=======
-dates <- seq(as.Date("2019-04-30"), length = 392, by = "days")
->>>>>>> Stashed changes
+
+dates <- seq(as.Date("2019-04-30"), length = uniqueN(data$event_date), by = "days")
+
 tayt <- xts(data[product_content_id==31515569],order.by=dates)
 disfirca <- xts(data[product_content_id==32939029],order.by=dates)
 mont <- xts(data[product_content_id==3904356],order.by=dates)
@@ -163,19 +161,17 @@ autoplot(yariave<-forecast(auto.arima(as.numeric(tayt_sonn$sold_count),xreg=as.n
 
 summary(yarin_tayt_visit)
 #summary(yarin_tayt_fave)
-<<<<<<< Updated upstream
+
 #yarin_tayt$mean
-fc <- c(yarin_tayt_visit$mean[4])
-=======
-yarin_tayt$mean
-fc <- c(yarin_tayt_visit$mean[18])
->>>>>>> Stashed changes
+fc <- c(yarin_tayt_visit$mean[9])
+
+
 
 
 #yarin_tayt_f
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
 disfirca_baslangic<- window(disfirca,start="2019-11-21")
-View(disfirca_baslangic)
+#View(disfirca_baslangic)
 df <- disfirca_baslangic[as.numeric(disfirca_baslangic$price)>0]
 
 
@@ -209,11 +205,11 @@ checkresiduals(mont_sold)
 yarin_mont <- forecast(mont_sold, xreg = as.numeric(mont$ty_visits), h = 2)
 autoplot(yarin_mont)
 yarin_mont$mean
-<<<<<<< Updated upstream
+
 fc <- c(fc, as.numeric(mont$sold_count[nrow(mont)]))
-=======
-fc <- c(fc, as.numeric(mont$sold_count[387]))
->>>>>>> Stashed changes
+
+#fc <- c(fc, as.numeric(mont$sold_count[387]))
+
 
 #model sacma tahmin veriyor,en mantiklisi verinin basladigi(-1 siz) tarihden itibaren xts alindi 
 mendil_available <- window(mendil,start="2019-09-09")
