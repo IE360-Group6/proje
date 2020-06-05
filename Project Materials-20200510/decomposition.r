@@ -445,5 +445,5 @@ fc <- c(fc, (fc_y_yuztemizleyici$mean[1]+fc_t_yuztemizleyici$mean[1]))
 predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=fc]
 
-send_submission(predictions, token, url=subm_url, submit_now=F)
+send_submission(predictions, token, url=subm_url, submit_now=T)
 
