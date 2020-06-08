@@ -163,13 +163,14 @@ summary(yarin_tayt_visit)
 #summary(yarin_tayt_fave)
 
 #yarin_tayt$mean
-fc_tayt <- yarin_tayt_visit$mean
+fc_tayt <- yarin_tayt_visit$mean[-c(1:207)]
 
-for_tayt_test = window(tayt, start = "2020-05-20", end = as.Date(as.Date("2020-05-20")+15))
-for_tayt_test = for_tayt_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+15)]$sold_count
+for_tayt_test = window(tayt, start = "2020-05-20", end = as.Date(as.Date("2020-05-20")+14))
+for_tayt_test = for_tayt_test$sold_count
 
-mae_tayt <- mean(abs(fc_tayt-for_tayt_test))/15
-mape_tayt <- 100*mean(abs((fc_tayt-for_tayt_test)/for_tayt_test))/15
+mae_tayt <- mean(abs(fc_tayt-as.numeric(for_tayt_test$sold_count)))/15
+mape_tayt <- 100*mean(abs((fc_tayt-as.numeric(for_tayt_test$sold_count))/as.numeric(for_tayt_test$sold_count)))/15
+
 
 
 #yarin_tayt_f
