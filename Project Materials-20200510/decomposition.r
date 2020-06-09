@@ -200,11 +200,11 @@ detr_for_tayt = for_tayt[,list(detr_sc, event_date, time_index, price, visit_cou
 
 y_tayt = ts(detr_for_tayt$detr_sc, freq = 7)
 plot(y_tayt)
-fc_y_tayt = forecast(y_tayt,1)
+fc_y_tayt = forecast(y_tayt,2)
 t_tayt = ts(for_tayt$lr_trend, freq = 7)
-fc_t_tayt = forecast(t_tayt, 1)
+fc_t_tayt = forecast(t_tayt,2)
 
-fc <- c(fc_y_tayt$mean[1]+fc_t_tayt$mean[1])
+fc <- c(fc_y_tayt$mean[2]+fc_t_tayt$mean[2])
 
 
 #SEASONALITY - TAYT - NO SEASONALITY
@@ -237,11 +237,11 @@ detr_for_disfirca = for_disfirca[,list(detr_sc, event_date, time_index, price, v
 
 y_disfirca = ts(detr_for_disfirca$detr_sc, freq = 7)
 plot(y_disfirca)
-fc_y_disfirca = forecast(y_disfirca,1)
+fc_y_disfirca = forecast(y_disfirca,2)
 t_disfirca = ts(for_disfirca$lr_trend, freq = 7)
-fc_t_disfirca = forecast(t_disfirca, 1)
+fc_t_disfirca = forecast(t_disfirca,2)
 
-fc <- c(fc, (fc_y_disfirca$mean[1]+fc_t_disfirca$mean[1]))
+fc <- c(fc, (fc_y_disfirca$mean[2]+fc_t_disfirca$mean[2]))
 
 
 #SEASONALITY - DISFIRCA - NO SEASONALITY
@@ -278,8 +278,8 @@ summary(fit_mont)
 deseason_mont=y_mont-coef(fit_mont)[1]
 plot(deseason_mont[1:(360*2)],type='l')
 
-fc_y_mont_deseas = forecast(deseason_mont,1)
-fc <- c(fc, max(0,fc_y_mont_deseas$mean[1]))
+fc_y_mont_deseas = forecast(deseason_mont,2)
+fc <- c(fc, max(0,fc_y_mont_deseas$mean[2]))
 
 #######################
 #TREND - MENDIL - NO TREND
@@ -303,8 +303,8 @@ plot(y_mendil)
 #fit_mendil=lm(y_mendil~f_mendil)
 #summary(fit_mendil)
 
-fc_y_mendil <- forecast(y_mendil,1)
-fc <- c(fc, fc_y_mendil$mean[1])
+fc_y_mendil <- forecast(y_mendil,2)
+fc <- c(fc, fc_y_mendil$mean[2])
 
 #######################
 #TREND - BIKINI - ??? NO TREND OLMASI MANTIKLI
@@ -331,8 +331,8 @@ summary(fit_bikini)
 deseason_bikini=y_bikini-coef(fit_bikini)[1]
 plot(deseason_bikini[1:(360*2)],type='l')
 
-fc_y_bikini_deseas = forecast(deseason_bikini,1)
-fc <- c(fc, max(0,fc_y_bikini_deseas$mean[1]))
+fc_y_bikini_deseas = forecast(deseason_bikini,2)
+fc <- c(fc, max(0,fc_y_bikini_deseas$mean[2]))
 
 #######################
 #TREND - KULAKLIK
@@ -353,11 +353,11 @@ detr_for_kulaklik = for_kulaklik[,list(detr_sc, event_date, time_index, price, v
 
 y_kulaklik = ts(detr_for_kulaklik$detr_sc, freq = 7)
 plot(y_kulaklik)
-fc_y_kulaklik = forecast(y_kulaklik,1)
+fc_y_kulaklik = forecast(y_kulaklik,2)
 t_kulaklik = ts(for_kulaklik$lr_trend, freq = 7)
-fc_t_kulaklik = forecast(t_kulaklik, 1)
+fc_t_kulaklik = forecast(t_kulaklik,2)
 
-fc <- c(fc, (fc_y_kulaklik$mean[1] + fc_t_kulaklik$mean[1]))
+fc <- c(fc, (fc_y_kulaklik$mean[2] + fc_t_kulaklik$mean[2]))
 
 #SEASONALITY - KULAKLIK - NO SEASONALITY
 #f_kulaklik=fourier(y_kulaklik, K=3)
@@ -387,11 +387,11 @@ detr_for_supurge = for_supurge[,list(detr_sc, event_date, time_index, price, vis
 
 y_supurge = ts(detr_for_supurge$detr_sc, freq = 7)
 plot(y_supurge)
-fc_y_supurge = forecast(y_supurge,1)
+fc_y_supurge = forecast(y_supurge,2)
 t_supurge = ts(for_supurge$lr_trend, freq = 7)
-fc_t_supurge = forecast(t_supurge, 1)
+fc_t_supurge = forecast(t_supurge,2)
 
-fc <- c(fc, (fc_y_supurge$mean[1]+fc_t_supurge$mean[1]))
+fc <- c(fc, (fc_y_supurge$mean[2]+fc_t_supurge$mean[2]))
 
 
 
@@ -422,11 +422,11 @@ detr_for_yuztemizleyici = for_yuztemizleyici[,list(detr_sc, event_date, time_ind
 
 y_yuztemizleyici = ts(detr_for_yuztemizleyici$detr_sc, freq = 7)
 plot(y_yuztemizleyici)
-fc_y_yuztemizleyici = forecast(y_yuztemizleyici,1)
+fc_y_yuztemizleyici = forecast(y_yuztemizleyici,2)
 t_yuztemizleyici = ts(for_yuztemizleyici$lr_trend, freq = 7)
-fc_t_yuztemizleyici = forecast(t_yuztemizleyici, 1)
+fc_t_yuztemizleyici = forecast(t_yuztemizleyici,2)
 
-fc <- c(fc, (fc_y_yuztemizleyici$mean[1]+fc_t_yuztemizleyici$mean[1]))
+fc <- c(fc, (fc_y_yuztemizleyici$mean[2]+fc_t_yuztemizleyici$mean[2]))
 
 
 #SEASONALITY - YUZTEMIZLEYICI - NO SEASONALITY
