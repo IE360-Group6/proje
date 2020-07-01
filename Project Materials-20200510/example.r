@@ -1,4 +1,5 @@
 # install the required packages first
+
 require(jsonlite)
 require(httr)
 require(data.table)
@@ -7,104 +8,104 @@ require(forecast)
 require(ggplot2)
 
 get_token <- function(username, password, url_site){
-    
-    post_body = list(username=username,password=password)
-    post_url_string = paste0(url_site,'/token/')
-    result = POST(post_url_string, body = post_body)
-
-    # error handling (wrong credentials)
-    if(result$status_code==400){
-        print('Check your credentials')
-        return(0)
-    }
-    else if (result$status_code==201){
-        output = content(result)
-        token = output$key
-    }
-
-    return(token)
+  
+  post_body = list(username=username,password=password)
+  post_url_string = paste0(url_site,'/token/')
+  result = POST(post_url_string, body = post_body)
+  
+  # error handling (wrong credentials)
+  if(result$status_code==400){
+    print('Check your credentials')
+    return(0)
+  }
+  else if (result$status_code==201){
+    output = content(result)
+    token = output$key
+  }
+  
+  return(token)
 }
 
 get_data <- function(start_date='2020-03-20', token, url_site){
-    
-    post_body = list(start_date=start_date,username=username,password=password)
-    post_url_string = paste0(url_site,'/dataset/')
-    
-    header = add_headers(c(Authorization=paste('Token',token,sep=' ')))
-    result = GET(post_url_string, header, body = post_body)
-    output = content(result)
-    data = data.table::rbindlist(output)
-    data[,event_date:=as.Date(event_date)]
-    data = data[order(product_content_id,event_date)]
-    return(data)
+  
+  post_body = list(start_date=start_date,username=username,password=password)
+  post_url_string = paste0(url_site,'/dataset/')
+  
+  header = add_headers(c(Authorization=paste('Token',token,sep=' ')))
+  result = GET(post_url_string, header, body = post_body)
+  output = content(result)
+  data = data.table::rbindlist(output)
+  data[,event_date:=as.Date(event_date)]
+  data = data[order(product_content_id,event_date)]
+  return(data)
 }
 
 
 send_submission <- function(predictions, token, url_site, submit_now=F){
-    
-    format_check=check_format(predictions)
-    if(!format_check){
-        return(FALSE)
-    }
-    
-    post_string="list("
-    for(i in 1:nrow(predictions)){
-        post_string=sprintf("%s'%s'=%s",post_string,predictions$product_content_id[i],predictions$forecast[i])
-        if(i<nrow(predictions)){
-            post_string=sprintf("%s,",post_string)
-        } else {
-            post_string=sprintf("%s)",post_string)
-        }
-    }
-    
-    submission = eval(parse(text=post_string))
-    json_body = jsonlite::toJSON(submission, auto_unbox = TRUE)
-    submission=list(submission=json_body)
-    
-    print(submission)
-    # {"31515569":2.4,"32939029":2.4,"4066298":2.4,"6676673":2.4,"7061886":2.4,"85004":2.4} 
-
-    if(!submit_now){
-        print("You did not submit.")
-        return(FALSE)      
-    }
-    
-
-    header = add_headers(c(Authorization=paste('Token',token,sep=' ')))
-    post_url_string = paste0(url_site,'/submission/')
-    result = POST(post_url_string, header, body=submission)
-    
-    if (result$status_code==201){
-        print("Successfully submitted. Below you can see the details of your submission")
+  
+  format_check=check_format(predictions)
+  if(!format_check){
+    return(FALSE)
+  }
+  
+  post_string="list("
+  for(i in 1:nrow(predictions)){
+    post_string=sprintf("%s'%s'=%s",post_string,predictions$product_content_id[i],predictions$forecast[i])
+    if(i<nrow(predictions)){
+      post_string=sprintf("%s,",post_string)
     } else {
-        print("Could not submit. Please check the error message below, contact the assistant if needed.")
+      post_string=sprintf("%s)",post_string)
     }
-    
-    print(content(result))
-    
+  }
+  
+  submission = eval(parse(text=post_string))
+  json_body = jsonlite::toJSON(submission, auto_unbox = TRUE)
+  submission=list(submission=json_body)
+  
+  print(submission)
+  # {"31515569":2.4,"32939029":2.4,"4066298":2.4,"6676673":2.4,"7061886":2.4,"85004":2.4} 
+  
+  if(!submit_now){
+    print("You did not submit.")
+    return(FALSE)      
+  }
+  
+  
+  header = add_headers(c(Authorization=paste('Token',token,sep=' ')))
+  post_url_string = paste0(url_site,'/submission/')
+  result = POST(post_url_string, header, body=submission)
+  
+  if (result$status_code==201){
+    print("Successfully submitted. Below you can see the details of your submission")
+  } else {
+    print("Could not submit. Please check the error message below, contact the assistant if needed.")
+  }
+  
+  print(content(result))
+  
 }
 
 check_format <- function(predictions){
-    
-    if(is.data.frame(predictions) | is.data.frame(predictions)){
-        if(all(c('product_content_id','forecast') %in% names(predictions))){
-            if(is.numeric(predictions$forecast)){
-                print("Format OK")
-                return(TRUE)
-            } else {
-                print("forecast information is not numeric")
-                return(FALSE)                
-            }
-        } else {
-            print("Wrong column names. Please provide 'product_content_id' and 'forecast' columns")
-            return(FALSE)
-        }
-        
+  
+  if(is.data.frame(predictions) | is.data.frame(predictions)){
+    if(all(c('product_content_id','forecast') %in% names(predictions))){
+      if(is.numeric(predictions$forecast)){
+        print("Format OK")
+        return(TRUE)
+      } else {
+        print("forecast information is not numeric")
+        return(FALSE)                
+      }
     } else {
-        print("Wrong format. Please provide data.frame or data.table object")
-        return(FALSE)
+      print("Wrong column names. Please provide 'product_content_id' and 'forecast' columns")
+      return(FALSE)
     }
     
+  } else {
+    print("Wrong format. Please provide data.frame or data.table object")
+    return(FALSE)
+  }
+  
 }
 
 # this part is main code
@@ -176,9 +177,10 @@ tayt_basket<-window(tayt,start="2020-01-25")
 tayt_basket_head<-head(tayt_basket,nrow(tayt_basket_start))
 tayt_sold_basket<-auto.arima(as.numeric(tayt_basket_start$sold_count),xreg=as.numeric(tayt_basket_head$basket_count))
 checkresiduals(tayt_sold_basket)
+#lag 0.1dan kucuk kontrol,normal dagilima yakin, white noise kontrol
 yarin_tayt_basket<-forecast(tayt_sold_basket,xreg=mean_basket_tayt)
 
-
+#AIC ler karsilastirildi kucuk olana daha yuksek weight verildi, lag 0.1dan kucuk kontrol,normal dagilima yakin, white noise kontrol
 mixed_yarin_tayt<-(0.40*yarin_tayt_basket$mean + 0.30 * yarin_tayt_visit$mean[1] +0.30*yarin_tayt_fav$mean[1])
 
 fc <- mixed_yarin_tayt[1]
@@ -188,6 +190,7 @@ fc <- mixed_yarin_tayt[1]
 #residual iyi model,5ten sonrasi daha iyi tahmin oluyor
 disfirca_baslangic<- window(disfirca,start="2019-11-21")
 #View(disfirca_baslangic), if price is same before and after it is used, if not the mean of the two days is used for price
+#Assumption olarak bir onceki gun ile bir sonraki gun fiyat ayniysa o fiyat gecerli, degilse ikisinin ortalamasi
 disfirca_baslangic$price["2019-11-21"] <- "99.95"
 disfirca_baslangic$price["2019-11-22"] <- "99.95"
 disfirca_baslangic$price["2019-11-30"] <- (as.numeric(disfirca_baslangic$price["2019-11-29"]) + as.numeric(disfirca_baslangic$price["2019-12-01"])) / 2
@@ -210,6 +213,7 @@ disfirca_pricefix<-disfirca_baslangic
 
 test_disfirca<-tail(disfirca,7)
 
+#modeli son bir haftanın favorilere eklenme sayisina gore 1 haftalik satis tahmini modeli olusturuyor
 #disfirca forecast by favored_count of last week
 disfirca_sold_fav <- auto.arima(as.numeric(disfirca_pricefix$sold_count), xreg = as.numeric(disfirca_pricefix$favored_count))
 autoplot(disfirca_sold_fav)
@@ -219,7 +223,8 @@ yarin_disfirca_fav<- forecast(disfirca_sold_fav, xreg = as.numeric(test_disfirca
 autoplot(yarin_disfirca_fav)
 yarin_disfirca_fav$mean
 
-#better, #disfirca forecast by visit_count of last week
+#modeli son bir haftanın ziyaret sayisina gore 1 haftalik satis tahmini modeli olusturuyor
+#better than the one above, #disfirca forecast by visit_count of last week
 disfirca_sold_visit <- auto.arima(as.numeric(disfirca_pricefix$sold_count), xreg = as.numeric(disfirca_pricefix$visit_count))
 autoplot(disfirca_sold_visit)
 summary(disfirca_sold_visit)
@@ -227,7 +232,7 @@ checkresiduals(disfirca_sold_visit)
 yarin_disfirca_visit<- forecast(disfirca_sold_visit, xreg = as.numeric(test_disfirca$visit_count)) 
 autoplot(yarin_disfirca_visit)
 
-#worst of the 3 , #disfirca forecast by visit_count of last week, p value so low
+#worst of the 3 , #, p value so low
 disfirca_sold_price <- auto.arima(as.numeric(disfirca_pricefix$sold_count), xreg = as.numeric(disfirca_pricefix$price))
 autoplot(disfirca_sold_price)
 summary(disfirca_sold_price)
@@ -235,7 +240,7 @@ checkresiduals(disfirca_sold_price)
 yarin_disfirca_price<- forecast(disfirca_sold_price, xreg = as.numeric(test_disfirca$price)) 
 autoplot(yarin_disfirca_price)
 
-#regressor is the mean of basket of 3-5 days 
+#regressor is the mean of basket of added 3,4 or 5 days ago, 24yle baslama nedeni satisa ciktigi gun
 ziyaret_disfirca<-tail(disfirca,5)
 mean_test_basket_disfirca<-head(ziyaret_disfirca,3)
 mean_basket_disfirca<-mean(as.numeric(mean_test_basket_disfirca$basket_count))
@@ -246,7 +251,7 @@ disfirca_sold_basket<-auto.arima(as.numeric(disfirca_basket_start$sold_count),xr
 checkresiduals(disfirca_sold_basket)
 yarin_disfirca_basket<-forecast(disfirca_sold_basket,xreg=mean_basket_disfirca)
 
-#mixed forecast of disfirca
+#mixed forecast of disfirca,Aic ye gore weight
 yarin_disfirca <- 0.35 * yarin_disfirca_visit$mean[1]  + 0.2 * yarin_disfirca_fav$mean[1] +  0.1 * yarin_disfirca_price$mean[1] + 0.35 * yarin_disfirca_basket$mean
 #summary(yarin_disfirca)
 
@@ -255,6 +260,7 @@ fc <- c(fc, yarin_disfirca[1])
 
 
 #forecast train set of last 3 months sfircaand test setof last week,using fav count as regressor in the model, giving 0 forecast makes sense
+#talep hizli degisip bahar sonrasi yaz boyunca ayni kaldigi icin boyle tercih edildi
 train_mont<-tail(mont,90)
 test_mont<-tail(mont,7)
 mont_sold_fav <- auto.arima(as.numeric(train_mont$sold_count), xreg = as.numeric(train_mont$favored_count))
@@ -269,7 +275,7 @@ fc <- c(fc, as.numeric(yarin_mont_fav$mean[1]))
 
 
 #model sacma tahmin veriyor,en mantiklisi verinin basladigi(-1 siz) tarihden itibaren xts alindi 
-
+#menidl satisa baslangic
 mendil_start <- window(mendil,start="2019-09-09")
 mendil_start$price["2019-10-12"] <- (as.numeric(mendil_start$price["2019-10-11"]) + as.numeric(mendil_start$price["2019-10-13"])) / 2
 test_mendil<-tail(mendil,7)
@@ -297,7 +303,7 @@ checkresiduals(mendil_sold_price)
 yarin_mendil_price<- forecast(mendil_sold_price, xreg = as.numeric(test_mendil$price)) 
 autoplot(yarin_mendil_price)
 
-#by fav count of 3-5 days ago, good
+#by fav count of 3-5 days ago, good, favori giris 13 aralık
 ziyaret_mendil<-tail(mendil_start,5)
 mean_test_fav_mendil<-head(ziyaret_mendil,3)
 mean_fav_mendil<-mean(as.numeric(mean_test_fav_mendil$favored_count))
@@ -311,7 +317,7 @@ checkresiduals(mendil_sold_fav)
 yarin_mendil_fav<- forecast(mendil_sold_fav, xreg = mean_fav_mendil) 
 yarin_mendil_fav$mean
 
-#by basket count of 3-5 days ago,best model
+#by basket count of 3-5 days ago,best model,basket verisi giris 24 ocak
 ziyaret_mendil<-tail(mendil_start,5)
 mean_test_basket_mendil<-head(ziyaret_mendil,3)
 mean_basket_mendil<-mean(as.numeric(mean_test_basket_mendil$basket_count))
@@ -337,7 +343,7 @@ fc <- c(fc,yarin_mendil[1])
 
 
 
-#seasonality effect visit_countta daha iyi ama neagtif veriyor price birakildi
+#seasonality effect visit_countta daha iyi ama neagtif veriyor price birakildi, cok seasonal olduğü icin son ay kullanildi
 bikini_start<-window(bikini,start="2020-05-15")
 bikini_sold <- auto.arima(as.numeric(bikini_start$sold_count), xreg = as.numeric(bikini_start$visit_count))
 checkresiduals(bikini_sold)
@@ -387,7 +393,7 @@ yarin_kulaklik_fav<- forecast(kulaklik_sold_fav, xreg = mean_fav_kulaklik)
 yarin_kulaklik_fav$mean
 
 
-#regressor is the mean of basket of 3-5 days ,AIc lowest, residual almost normal
+#regressor is the mean of basket of 3-5 days ,AIc lowest, residual almost normal, basket veri baslangic 24 ocak
 ziyaret_kulaklik<-tail(kulaklik,5)
 mean_test_basket_kulaklik<-head(ziyaret_kulaklik,3)
 mean_basket_kulaklik<-mean(as.numeric(mean_test_basket_kulaklik$basket_count))
@@ -432,7 +438,7 @@ checkresiduals(supurge_sold_price)
 yarin_supurge_price<- forecast(supurge_sold_price, xreg = as.numeric(test_supurge$price)) 
 autoplot(yarin_supurge_price)
 
-#by favored of 3-5 ago, residual not  normally, AIcc=2458
+#by favored of 3-5 ago, residual not  normally, AIcc=2458 , veri girisi start duzeltme
 ziyaret_supurge<-tail(supurge,5)
 mean_test_fav_supurge<-head(ziyaret_supurge,3)
 mean_fav_supurge<-mean(as.numeric(mean_test_fav_supurge$favored_count))
@@ -532,5 +538,5 @@ predictions=unique(data[,list(product_content_id)])
 predictions[,forecast:=fc]
 
 
-send_submission(predictions, token, url=subm_url, submit_now=F)
-    
+send_submission(predictions, token, url=subm_url, submit_now=T)
+
