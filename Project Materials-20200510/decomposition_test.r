@@ -128,65 +128,34 @@ products = unique(data$product_content_id)
 
 tayt_d = data[product_content_id == products[1]]
 tayt_d = tayt_d[order(event_date)]
-#visit_count
-#sold_tayt=zoo(tayt[,list(sold_count, visit_count, basket_count, favored_count)],tayt$event_date)
-#plot(sold_tayt)
 
+disfirca_d = data[product_content_id == products[2]]
+disfirca_d = disfirca_d[order(event_date)]
 
-disfirca = data[product_content_id == products[2]]
-disfirca = disfirca[order(event_date)]
-#visit_count & basket_count
-#sold_disfirca=zoo(disfirca[,list(sold_count, visit_count, basket_count, favored_count)],disfirca$event_date)
-#plot(sold_disfirca)
+mont_d = data[product_content_id == products[3]]
+mont_d = mont_d[order(event_date)]
 
+mendil_d = data[product_content_id == products[4]]
+mendil_d = mendil_d[order(event_date)]
 
-mont = data[product_content_id == products[3]]
-mont = mont[order(event_date)]
-#visit_count | favored_count
-#sold_mont=zoo(mont[,list(sold_count, visit_count, basket_count, favored_count)],mont$event_date)
-#plot(sold_mont)
+bikini_d = data[product_content_id == products[5]]
+bikini_d = bikini_d[order(event_date)]
 
+kulaklik_d = data[product_content_id == products[6]]
+kulaklik_d = kulaklik_d[order(event_date)]
 
-mendil = data[product_content_id == products[4]]
-mendil = mendil[order(event_date)]
-#visit_count
-#sold_mendil=zoo(mendil[,list(sold_count, visit_count, basket_count, favored_count)],mendil$event_date)
-#plot(sold_mendil)
+supurge_d = data[product_content_id == products[7]]
+supurge_d = supurge_d[order(event_date)]
 
-
-bikini = data[product_content_id == products[5]]
-bikini = bikini[order(event_date)]
-#favored_count??
-#sold_bikini=zoo(bikini[,list(sold_count, visit_count, basket_count, favored_count)],bikini$event_date)
-#plot(sold_bikini)
-
-
-kulaklik = data[product_content_id == products[6]]
-kulaklik = kulaklik[order(event_date)]
-#visit_count & (?)favored_count
-#sold_kulaklik=zoo(kulaklik[,list(sold_count, visit_count, basket_count, favored_count)],kulaklik$event_date)
-#plot(sold_kulaklik)
-
-
-supurge = data[product_content_id == products[7]]
-supurge = supurge[order(event_date)]
-#basket_count + visit_cpunt ??
-#sold_supurge=zoo(supurge[,list(sold_count, visit_count, basket_count, favored_count)],supurge$event_date)
-#plot(sold_supurge)
-
-
-yuztemizleyici = data[product_content_id == products[8]]
-yuztemizleyici = yuztemizleyici[order(event_date)]
-#visit_count + basket_count ??
-#sold_yuztemizleyici=zoo(yuztemizleyici[,list(sold_count, visit_count, basket_count, favored_count)],yuztemizleyici$event_date)
-#plot(sold_yuztemizleyici)
+yuztemizleyici_d = data[product_content_id == products[8]]
+yuztemizleyici_d = yuztemizleyici_d[order(event_date)]
 
 #######################
 #TAYT - Trend - No Seasonality
 
 fc_tayt <- -1
 for(i in 1:7){
-    for_tayt = tayt[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_tayt = tayt_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     
     for_tayt = for_tayt[event_date > "2019-10-01" & event_date < as.Date(as.Date("2020-05-18") + i)]
     for_tayt[,time_index:=1:.N]
@@ -215,7 +184,7 @@ for(i in 1:7){
 fc_tayt <- fc_tayt[-1]
 fc_tayt
 
-for_tayt_test = tayt[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_tayt_test = tayt_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_tayt_test = for_tayt_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 mae_tayt <- mean(abs(fc_tayt-for_tayt_test))
@@ -227,7 +196,7 @@ mape_tayt <- 100*mean(abs((fc_tayt-for_tayt_test)/for_tayt_test))
 
 fc_disfirca <- -1
 for(i in 1:7){
-    for_disfirca = disfirca[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_disfirca = disfirca_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     
     for_disfirca = for_disfirca[event_date > "2019-12-01" & event_date < as.Date(as.Date("2020-05-18") + i)]
     for_disfirca[,time_index:=1:.N]
@@ -255,7 +224,7 @@ fc_disfirca <- fc_disfirca[-1]
 fc_disfirca
 
 
-for_disfirca_test = disfirca[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_disfirca_test = disfirca_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_disfirca_test = for_disfirca_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 mae_disfirca <- mean(abs(fc_disfirca-for_disfirca_test))
@@ -268,7 +237,7 @@ mape_disfirca <- 100*mean(abs((fc_disfirca-for_disfirca_test)/for_disfirca_test)
 
 fc_mont <- -1
 for(i in 1:7){
-    for_mont = mont[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_mont = mont_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     
     for_mont = for_mont[event_date < as.Date(as.Date("2020-05-18") + i)]
     for_mont[,time_index:=1:.N]
@@ -292,7 +261,7 @@ for(i in 1:7){
 fc_mont <- fc_mont[-1]
 fc_mont
 
-for_mont_test = mont[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_mont_test = mont_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_mont_test = for_mont_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 #gercek veriler 0 oldugu icin mape=inf
@@ -304,7 +273,7 @@ mape_mont <- 100*mean(abs((fc_mont-for_mont_test)/for_mont_test))
 
 fc_mendil <- -1
 for(i in 1:7){
-    for_mendil = mendil[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_mendil = mendil_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     
     for_mendil = for_mendil[event_date > "2019-09-10" & event_date < as.Date(as.Date("2020-05-18") + i)]
     for_mendil[,time_index:=1:.N]
@@ -319,7 +288,7 @@ fc_mendil <- fc_mendil[-1]
 fc_mendil
 
 
-for_mendil_test = mendil[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_mendil_test = mendil_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_mendil_test = for_mendil_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 mae_mendil <- mean(abs(fc_mendil-for_mendil_test))
@@ -330,7 +299,7 @@ mape_mendil <- 100*mean(abs((fc_mendil-for_mendil_test)/for_mendil_test))
 
 fc_bikini <- -1
 for(i in 1:7){
-    for_bikini = bikini[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_bikini = bikini_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     for_bikini = for_bikini[event_date < as.Date(as.Date("2020-05-18") + i)]
     for_bikini[,time_index:=1:.N]
     tail(for_bikini)
@@ -355,7 +324,7 @@ for(i in 1:7){
 fc_bikini <- fc_bikini[-1]
 fc_bikini
 
-for_bikini_test = bikini[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_bikini_test = bikini_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_bikini_test = for_bikini_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 #gercek veriler 0 oldugu icin mape=inf
@@ -367,7 +336,7 @@ mape_bikini <- 100*mean(abs((fc_bikini-for_bikini_test)/for_bikini_test))
 
 fc_kulaklik <- -1
 for(i in 1:7){
-    for_kulaklik = kulaklik[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_kulaklik = kulaklik_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     
     for_kulaklik = for_kulaklik[event_date > "2019-06-20" & event_date < as.Date(as.Date("2020-05-18") + i)]
     for_kulaklik[,time_index:=1:.N]
@@ -395,7 +364,7 @@ fc_kulaklik <- fc_kulaklik[-1]
 fc_kulaklik
 
 
-for_kulaklik_test = kulaklik[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_kulaklik_test = kulaklik_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_kulaklik_test = for_kulaklik_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 mae_kulaklik <- mean(abs(fc_kulaklik-for_kulaklik_test))
@@ -407,7 +376,7 @@ mape_kulaklik <- 100*mean(abs((fc_kulaklik-for_kulaklik_test)/for_kulaklik_test)
 
 fc_supurge <- -1
 for(i in 1:7){
-    for_supurge = supurge[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_supurge = supurge_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     
     for_supurge = for_supurge[event_date > "2019-07-25" & event_date < as.Date(as.Date("2020-05-18") + i)]
     for_supurge[,time_index:=1:.N]
@@ -435,7 +404,7 @@ fc_supurge <- fc_supurge[-1]
 fc_supurge
 
 
-for_supurge_test = supurge[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_supurge_test = supurge_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_supurge_test = for_supurge_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 mae_supurge <- mean(abs(fc_supurge-for_supurge_test))
@@ -447,7 +416,7 @@ mape_supurge <- 100*mean(abs((fc_supurge-for_supurge_test)/for_supurge_test))
 
 fc_yuztemizleyici <- -1
 for(i in 1:7){
-    for_yuztemizleyici = yuztemizleyici[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+    for_yuztemizleyici = yuztemizleyici_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
     for_yuztemizleyici = for_yuztemizleyici[event_date < as.Date(as.Date("2020-05-18") + i)]
     for_yuztemizleyici[,time_index:=1:.N]
     #tail(for_yuztemizleyici)
@@ -474,7 +443,7 @@ fc_yuztemizleyici <- fc_yuztemizleyici[-1]
 fc_yuztemizleyici
 
 
-for_yuztemizleyici_test = yuztemizleyici[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_yuztemizleyici_test = yuztemizleyici_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_yuztemizleyici_test = for_yuztemizleyici_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 mae_yuztemizleyici <- mean(abs(fc_yuztemizleyici-for_yuztemizleyici_test))
