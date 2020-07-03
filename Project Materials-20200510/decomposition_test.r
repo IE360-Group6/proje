@@ -184,33 +184,41 @@ yuztemizleyici = yuztemizleyici[order(event_date)]
 
 #TREND - TAYT
 for_tayt = tayt[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_tayt = for_tayt[event_date > "2019-10-01" & event_date < "2020-05-20"]
-for_tayt[,time_index:=1:.N]
-head(for_tayt)
 
-trend_tayt = lm(sold_count~time_index, data = for_tayt)
-#trend_tayt = lm(sold_count~time_index+visit_count, data = for_tayt)
-summary(trend_tayt)
-trend_tayt_component = trend_tayt$fitted
-for_tayt[,lr_trend:=trend_tayt_component]
-matplot(for_tayt[,list(sold_count, lr_trend)], type = "l")
+fc_tayt <- -1
+for(i in 1:7){
+    for_tayt = for_tayt[event_date > "2019-10-01" & event_date < as.Date(as.Date("2020-05-18") + i)]
+    for_tayt[,time_index:=1:.N]
+    #head(for_tayt)    
+    #tail(for_tayt)
+    
+    trend_tayt = lm(sold_count~time_index, data = for_tayt)
+    summary(trend_tayt)
+    trend_tayt_component = trend_tayt$fitted
+    for_tayt[,lr_trend:=trend_tayt_component]
+    #matplot(for_tayt[,list(sold_count, lr_trend)], type = "l")
+    
+    for_tayt[,detr_sc:=sold_count-lr_trend]
+    detr_for_tayt = for_tayt[,list(detr_sc, event_date, time_index, price, visit_count, favored_count, basket_count)]
+    
+    y_tayt = ts(detr_for_tayt$detr_sc, freq = 7)
+    t_tayt = ts(for_tayt$lr_trend, freq = 7)
 
-for_tayt[,detr_sc:=sold_count-lr_trend]
-detr_for_tayt = for_tayt[,list(detr_sc, event_date, time_index, price, visit_count, favored_count, basket_count)]
+    fc_y_tayt = forecast(y_tayt,i)
+    fc_t_tayt = forecast(t_tayt,i)
+    
+    fc_tayt <- c(fc_tayt, (fc_y_tayt$mean[i]+fc_t_tayt$mean[i]))
+    
+}
 
-y_tayt = ts(detr_for_tayt$detr_sc, freq = 7)
-t_tayt = ts(for_tayt$lr_trend, freq = 7)
-#plot(y_tayt)
-fc_y_tayt = forecast(y_tayt,15)
-fc_t_tayt = forecast(t_tayt,15)
-
-fc_tayt <- fc_y_tayt$mean+fc_t_tayt$mean
+fc_tayt <- fc_tayt[-1]
+#fc_tayt
 
 for_tayt_test = tayt[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_tayt_test = for_tayt_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+15)]$sold_count
+for_tayt_test = for_tayt_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
-mae_tayt <- mean(abs(fc_tayt-for_tayt_test))/15
-mape_tayt <- 100*mean(abs((fc_tayt-for_tayt_test)/for_tayt_test))/15
+mae_tayt <- mean(abs(fc_tayt-for_tayt_test))
+mape_tayt <- 100*mean(abs((fc_tayt-for_tayt_test)/for_tayt_test))
 
 #SEASONALITY - TAYT - NO SEASONALITY
 #f_tayt=fourier(y_tayt, K=3)
@@ -226,33 +234,40 @@ mape_tayt <- 100*mean(abs((fc_tayt-for_tayt_test)/for_tayt_test))/15
 #######################
 #TREND - DISFIRCA
 for_disfirca = disfirca[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_disfirca = for_disfirca[event_date > "2019-12-01" & event_date < "2020-05-20"]
-for_disfirca[,time_index:=1:.N]
-head(for_disfirca)
 
-trend_disfirca = lm(sold_count~time_index, data = for_disfirca)
-#trend_disfirca = lm(sold_count~time_index+visit_count+basket_count, data = for_disfirca)
-summary(trend_disfirca)
-trend_disfirca_component = trend_disfirca$fitted
-for_disfirca[,lr_trend:=trend_disfirca_component]
-matplot(for_disfirca[,list(sold_count, lr_trend)], type = "l")
+fc_disfirca <- -1
+for(i in 1:7){
+    for_disfirca = for_disfirca[event_date > "2019-12-01" & event_date < as.Date(as.Date("2020-05-18") + i)]
+    for_disfirca[,time_index:=1:.N]
+    #head(for_disfirca)    
+    
+    trend_disfirca = lm(sold_count~time_index, data = for_disfirca)
+    summary(trend_disfirca)
+    trend_disfirca_component = trend_disfirca$fitted
+    for_disfirca[,lr_trend:=trend_disfirca_component]
+    #matplot(for_disfirca[,list(sold_count, lr_trend)], type = "l")
+    
+    for_disfirca[,detr_sc:=sold_count-lr_trend]
+    detr_for_disfirca = for_disfirca[,list(detr_sc, event_date, time_index, price, visit_count, favored_count, basket_count)]
+    
+    y_disfirca = ts(detr_for_disfirca$detr_sc, freq = 7)
+    #plot(y_disfirca)
+    fc_y_disfirca = forecast(y_disfirca,i)
+    t_disfirca = ts(for_disfirca$lr_trend, freq = 7)
+    fc_t_disfirca = forecast(t_disfirca,i)
+    
+    fc_disfirca <- c(fc_disfirca, fc_y_disfirca$mean[i]+fc_t_disfirca$mean[i])
+}
 
-for_disfirca[,detr_sc:=sold_count-lr_trend]
-detr_for_disfirca = for_disfirca[,list(detr_sc, event_date, time_index, price, visit_count, favored_count, basket_count)]
+fc_disfirca <- fc_disfirca[-1]
+fc_disfirca
 
-y_disfirca = ts(detr_for_disfirca$detr_sc, freq = 7)
-plot(y_disfirca)
-fc_y_disfirca = forecast(y_disfirca,15)
-t_disfirca = ts(for_disfirca$lr_trend, freq = 7)
-fc_t_disfirca = forecast(t_disfirca,15)
-
-fc_disfirca <- fc_y_disfirca$mean+fc_t_disfirca$mean
 
 for_disfirca_test = disfirca[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_disfirca_test = for_disfirca_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+15)]$sold_count
+for_disfirca_test = for_disfirca_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
-mae_disfirca <- mean(abs(fc_disfirca-for_disfirca_test))/15
-mape_disfirca <- 100*mean(abs((fc_disfirca-for_disfirca_test)/for_disfirca_test))/15
+mae_disfirca <- mean(abs(fc_disfirca-for_disfirca_test))
+mape_disfirca <- 100*mean(abs((fc_disfirca-for_disfirca_test)/for_disfirca_test))
 
 
 #SEASONALITY - DISFIRCA - NO SEASONALITY
@@ -267,52 +282,55 @@ mape_disfirca <- 100*mean(abs((fc_disfirca-for_disfirca_test)/for_disfirca_test)
 #######################
 #TREND - MONT - NO TREND
 for_mont = mont[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_mont = for_mont[event_date < "2020-05-20"]
-for_mont[,time_index:=1:.N]
+
 #head(for_mont)
-
-trend_mont = lm(sold_count~time_index, data = for_mont)
-#trend_tayt = lm(sold_count~time_index+visit_count, data = for_tayt)
-summary(trend_mont)
-
-y_mont = ts(for_mont$sold_count, freq = 360)
-plot(y_mont)
+#trend_mont = lm(sold_count~time_index, data = for_mont)
+#summary(trend_mont)
 
 
 #SEASONALITY - MONT
-f_mont=fourier(y_mont, K=10)
-#str(f_mont)
-matplot(f_mont[1:360,1:2],type='l')
+fc_mont <- -1
+for(i in 1:7){
+    for_mont = for_mont[event_date < as.Date(as.Date("2020-05-18") + i)]
+    for_mont[,time_index:=1:.N]
+    
+    y_mont = ts(for_mont$sold_count, freq = 360)
+    
+    f_mont=fourier(y_mont, K=10)
+    #str(f_mont)
+    #matplot(f_mont[1:360,1:2],type='l')
+    
+    fit_mont=lm(y_mont~f_mont)
+    summary(fit_mont)
+    
+    deseason_mont=y_mont-coef(fit_mont)[1]
+    #plot(deseason_mont[1:(360*2)],type='l')
+    
+    fc_y_mont_deseas = forecast(deseason_mont,i)
+    fc_mont <- c(fc_mont, fc_y_mont_deseas$mean[i])
+}
 
-fit_mont=lm(y_mont~f_mont)
-summary(fit_mont)
-
-deseason_mont=y_mont-coef(fit_mont)[1]
-plot(deseason_mont[1:(360*2)],type='l')
-
-fc_y_mont_deseas = forecast(deseason_mont,15)
-fc_mont <- fc_y_mont_deseas$mean
+fc_mont <- fc_mont[-1]
+fc_mont
 
 for_mont_test = mont[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_mont_test = for_mont_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+15)]$sold_count
+for_mont_test = for_mont_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 #gercek veriler 0 oldugu icin mape=inf
-mae_mont <- mean(abs(fc_mont-for_mont_test))/15
-mape_mont <- 100*mean(abs((fc_mont-for_mont_test)/for_mont_test))/15
+mae_mont <- mean(abs(fc_mont-for_mont_test))
+mape_mont <- 100*mean(abs((fc_mont-for_mont_test)/for_mont_test))
 
 #######################
 #TREND - MENDIL - NO TREND
 for_mendil = mendil[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_mendil = for_mendil[event_date > "2019-09-10" & event_date < "2020-05-20"]
-for_mendil[,time_index:=1:.N]
+
 #head(for_mendil)
 
 #trend_mendil = lm(sold_count~time_index, data = for_mendil)
 ##trend_mendil = lm(sold_count~time_index+visit_count, data = for_mendil)
 #summary(trend_mendil)
 
-y_mendil = ts(for_mendil$sold_count, freq = 7)
-plot(y_mendil)
+#plot(y_mendil)
 
 #SEASONALITY - MENDIL - NO SEASONALITY
 #f_mendil=fourier(y_mendil, K=3)
@@ -322,51 +340,75 @@ plot(y_mendil)
 #fit_mendil=lm(y_mendil~f_mendil)
 #summary(fit_mendil)
 
-fc_y_mendil <- forecast(y_mendil,15)
-fc_mendil <- fc_y_mendil$mean
+fc_mendil <- -1
+
+for(i in 1:7){
+    
+    for_mendil = for_mendil[event_date > "2019-09-10" & event_date < as.Date(as.Date("2020-05-18") + i)]
+    for_mendil[,time_index:=1:.N]
+    #tail(for_mendil)
+    y_mendil = ts(for_mendil$sold_count, freq = 7)
+    
+    fc_y_mendil <- forecast(y_mendil,i)
+    fc_mendil <- c(fc_mendil, fc_y_mendil$mean[i])
+}
+
+fc_mendil <- fc_mendil[-1]
+fc_mendil
+
 
 for_mendil_test = mendil[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_mendil_test = for_mendil_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+15)]$sold_count
+for_mendil_test = for_mendil_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
-mae_mendil <- mean(abs(fc_mendil-for_mendil_test))/15
-mape_mendil <- 100*mean(abs((fc_mendil-for_mendil_test)/for_mendil_test))/15
+mae_mendil <- mean(abs(fc_mendil-for_mendil_test))
+mape_mendil <- 100*mean(abs((fc_mendil-for_mendil_test)/for_mendil_test))
 
 #######################
 #TREND - BIKINI - ??? NO TREND OLMASI MANTIKLI
 for_bikini = bikini[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_bikini = for_bikini[event_date < "2020-05-20"]
-for_bikini[,time_index:=1:.N]
+
 #head(for_bikini)
 
 #trend_bikini = lm(sold_count~time_index, data = for_bikini)
-##trend_bikini = lm(sold_count~time_index+favored_count, data = for_bikini)
 #summary(trend_bikini)
 
-y_bikini = ts(for_bikini$sold_count, freq = 360)
-plot(y_bikini)
+
+#plot(y_bikini)
 
 
 #SEASONALITY - BIKINI
-f_bikini=fourier(y_bikini, K=10)
-str(f_bikini)
-matplot(f_bikini[1:360,1:2],type='l')
+fc_bikini <- -1
+for(i in 1:7){
+    for_bikini = for_bikini[event_date < as.Date(as.Date("2020-05-18") + i)]
+    for_bikini[,time_index:=1:.N]
+    tail(for_bikini)
+    
+    y_bikini = ts(for_bikini$sold_count, freq = 360)
+    
+    f_bikini=fourier(y_bikini, K=10)
+    #str(f_bikini)
+    #matplot(f_bikini[1:360,1:2],type='l')
+    
+    fit_bikini=lm(y_bikini~f_bikini)
+    summary(fit_bikini)
+    
+    deseason_bikini=y_bikini-coef(fit_bikini)[1]
+    #plot(deseason_bikini[1:(360*2)],type='l')
+    
+    fc_y_bikini_deseas = forecast(deseason_bikini,i)
+    
+    fc_bikini = c(fc_bikini, fc_y_bikini_deseas$mean[i])
+}
 
-fit_bikini=lm(y_bikini~f_bikini)
-summary(fit_bikini)
-
-deseason_bikini=y_bikini-coef(fit_bikini)[1]
-plot(deseason_bikini[1:(360*2)],type='l')
-
-fc_y_bikini_deseas = forecast(deseason_bikini,15)
-
-fc_bikini = fc_y_bikini_deseas$mean
+fc_bikini <- fc_bikini[-1]
+fc_bikini
 
 for_bikini_test = bikini[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
-for_bikini_test = for_bikini_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+15)]$sold_count
+for_bikini_test = for_bikini_test[event_date >= "2020-05-20" & event_date < as.Date(as.Date("2020-05-20")+7)]$sold_count
 
 #gercek veriler 0 oldugu icin mape=inf
-mae_bikini <- mean(abs(fc_bikini-for_bikini_test))/15
-mape_bikini <- 100*mean(abs((fc_bikini-for_bikini_test)/for_bikini_test))/15
+mae_bikini <- mean(abs(fc_bikini-for_bikini_test))
+mape_bikini <- 100*mean(abs((fc_bikini-for_bikini_test)/for_bikini_test))
 
 #######################
 #TREND - KULAKLIK
@@ -490,6 +532,8 @@ mape_yuztemizleyici <- 100*mean(abs((fc_yuztemizleyici-for_yuztemizleyici_test)/
 
 #######################
 
+#mendile bak!!!!!
+#bikini!!!!
 
 
 predictions=unique(data[,list(product_content_id)])
