@@ -200,10 +200,13 @@ detr_for_tayt = for_tayt[,list(detr_sc, event_date, time_index, price, visit_cou
 
 y_tayt = ts(detr_for_tayt$detr_sc, freq = 7)
 plot(y_tayt)
+#trendsiz datanin forecasti
 fc_y_tayt = forecast(y_tayt,2)
 t_tayt = ts(for_tayt$lr_trend, freq = 7)
+#trendin forecasti
 fc_t_tayt = forecast(t_tayt,2)
 
+#1. sacma oldugu icin 2.gun forecasti alindi
 fc <- c(fc_y_tayt$mean[2]+fc_t_tayt$mean[2])
 
 
@@ -268,6 +271,7 @@ plot(y_mont)
 
 
 #SEASONALITY - MONT
+#en iyi k degeri icin AIC
 f_mont=fourier(y_mont, K=10)
 #str(f_mont)
 matplot(f_mont[1:360,1:2],type='l')
@@ -439,7 +443,6 @@ fc <- c(fc, (fc_y_yuztemizleyici$mean[2]+fc_t_yuztemizleyici$mean[2]))
 
 
 #######################
-
 
 
 predictions=unique(data[,list(product_content_id)])
