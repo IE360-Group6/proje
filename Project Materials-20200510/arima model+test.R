@@ -161,11 +161,7 @@ yarin_tayt_basket<-forecast(tayt_sold_basket,xreg=as.numeric(test_tayt$basket_co
 
 #AIC ler karsilastirildi kucuk olana daha yuksek weight verildi, lag 0.1dan kucuk kontrol,normal dagilima yakin, white noise kontrol
 mixed_yarin_tayt<-(0.40*yarin_tayt_basket$mean[1] + 0.30 * yarin_tayt_visit$mean[1] +0.30*yarin_tayt_fav$mean[1])
-
-
-
 fc <- mixed_yarin_tayt[1]
-
 
 #test for tayt
 sum_mae <- 0
@@ -185,9 +181,9 @@ for(i in seq(1,7,1)){
   tayt_sonn <- tayt_son[as.numeric(tayt_son$price)>0]
   
   tayt_sold_visit<-auto.arima(as.numeric(tayt_start$sold_count),xreg=as.numeric(tayt_fav_duration$visit_count))
-
+  
   yarin_tayt_visit<-forecast(tayt_sold_visit,xreg=as.numeric(test_tayt$visit_count))
-
+  
   ziyaret_tayt<-tail(tayt,5)
   mean_test_basket_tayt<-head(ziyaret_tayt,3)
   mean_basket_tayt<-mean(as.numeric(mean_test_basket_tayt$basket_count))
@@ -195,7 +191,7 @@ for(i in seq(1,7,1)){
   tayt_basket<-window(tayt_test_model,start="2020-01-25")
   tayt_basket_head<-head(tayt_basket,nrow(tayt_basket_start))
   tayt_sold_basket<-auto.arima(as.numeric(tayt_basket_start$sold_count),xreg=as.numeric(tayt_basket_head$basket_count))
-
+  
   yarin_tayt_basket<-forecast(tayt_sold_basket,xreg=as.numeric(test_tayt$basket_count))
   
   
@@ -278,20 +274,20 @@ for(i in seq(1,7,1)){
   test_disfirca<-tail(disfirca_test_duration,7)
   
   disfirca_sold_fav <- auto.arima(as.numeric(disfirca_test_duration$sold_count), xreg = as.numeric(disfirca_test_duration$favored_count))
- 
+  
   yarin_disfirca_fav<- forecast(disfirca_sold_fav, xreg = as.numeric(test_disfirca$favored_count)) 
-
+  
   yarin_disfirca_fav$mean
   
   disfirca_sold_visit <- auto.arima(as.numeric(disfirca_test_duration$sold_count), xreg = as.numeric(disfirca_test_duration$visit_count))
-
+  
   yarin_disfirca_visit<- forecast(disfirca_sold_visit, xreg = as.numeric(test_disfirca$visit_count)) 
-
+  
   
   disfirca_sold_price <- auto.arima(as.numeric(disfirca_test_duration$sold_count), xreg = as.numeric(disfirca_test_duration$price))
- 
+  
   yarin_disfirca_price<- forecast(disfirca_sold_price, xreg = as.numeric(test_disfirca$price)) 
-
+  
   
   ziyaret_disfirca<-tail(disfirca_test_duration,5)
   mean_test_basket_disfirca<-head(ziyaret_disfirca,3)
@@ -312,7 +308,7 @@ for(i in seq(1,7,1)){
   
   sum_mape <- sum_mape + (abs(as.numeric(test_data_disfirca$sold_count[i])-yarin_disfirca[1]) / as.numeric(test_data_disfirca$sold_count[i]))
   mape_disfirca_arima <- sum_mape/7 * 100
-
+  
 }
 
 mont <- xts(data[product_content_id==3904356],order.by=dates) 
@@ -332,16 +328,16 @@ fc <- c(fc, as.numeric(yarin_mont_fav$mean[1]))
 sum_mae <- 0
 sum_mape <-0
 for(i in seq(1,7,1)){
-train_mont <- window(train_mont,end=as.Date(as.Date("2020-05-18")+i-1))
-test_data_mont<-head(window(mont,start="2020-05-20"),7)
-mont_sold_fav <- auto.arima(as.numeric(train_mont$sold_count), xreg = as.numeric(train_mont$favored_count))
-yarin_mont <- forecast(mont_sold_fav, xreg = as.numeric(test_mont$sold_count))
-sum_mae <- sum_mae+ abs(as.numeric(test_data_mont$sold_count[i])-yarin_mont$mean[1])
-mae_mont_arima<-sum_mae/7
-
-sum_mape <- sum_mape + (abs(as.numeric(test_data_mont$sold_count[i])-as.numeric(yarin_mont$mean[1]))/ as.numeric(test_data_mont$sold_count[i]))
-mape_mont_arima <- sum_mape/7 * 100
-
+  train_mont <- window(train_mont,end=as.Date(as.Date("2020-05-18")+i-1))
+  test_data_mont<-head(window(mont,start="2020-05-20"),7)
+  mont_sold_fav <- auto.arima(as.numeric(train_mont$sold_count), xreg = as.numeric(train_mont$favored_count))
+  yarin_mont <- forecast(mont_sold_fav, xreg = as.numeric(test_mont$sold_count))
+  sum_mae <- sum_mae+ abs(as.numeric(test_data_mont$sold_count[i])-yarin_mont$mean[1])
+  mae_mont_arima<-sum_mae/7
+  
+  sum_mape <- sum_mape + (abs(as.numeric(test_data_mont$sold_count[i])-as.numeric(yarin_mont$mean[1]))/ as.numeric(test_data_mont$sold_count[i]))
+  mape_mont_arima <- sum_mape/7 * 100
+  
 }
 
 mendil <- xts(data[product_content_id==4066298],order.by=dates)
@@ -408,7 +404,7 @@ sum_mae <- 0
 sum_mape <-0
 for(i in seq(1,7,1)){
   mendil_start <- window(mendil_start,end=as.Date(as.Date("2020-05-18")+i-1))
-
+  
   test_data_mendil<-head(window(mendil,start="2020-05-20"),7)
   test_mendil<-tail(mendil_start,7)
   
@@ -420,7 +416,7 @@ for(i in seq(1,7,1)){
   mendil_visit_head<-head(mendil_visit,nrow(mendil_visit_start))
   mendil_sold_visit <- auto.arima(as.numeric(mendil_visit_start$sold_count), xreg = as.numeric(mendil_visit_head$visit_count))
   yarin_mendil_visit<- forecast(mendil_sold_visit, xreg = mean_visit_mendil) 
-
+  
   mendil_sold_price <- auto.arima(as.numeric(mendil_start$sold_count), xreg = as.numeric(mendil_start$price))
   yarin_mendil_price<- forecast(mendil_sold_price, xreg = as.numeric(test_mendil$price)) 
   
@@ -543,11 +539,11 @@ for(i in seq(1,7,1)){
   
   kulaklik_sold_visit <- auto.arima(as.numeric(kulaklik_start$sold_count), xreg = as.numeric(kulaklik_start$visit_count))
   yarin_kulaklik_visit<- forecast(kulaklik_sold_visit, xreg = as.numeric(test_kulaklik$visit_count)) 
-
+  
   kulaklik_sold_price <- auto.arima(as.numeric(kulaklik_debut$sold_count), xreg = as.numeric(kulaklik_debut$price))
   yarin_kulaklik_price<- forecast(kulaklik_sold_price, xreg = as.numeric(test_kulaklik$price)) 
-
-
+  
+  
   ziyaret_kulaklik<-tail(kulaklik,5)
   mean_test_fav_kulaklik<-head(ziyaret_kulaklik,3)
   mean_fav_kulaklik<-mean(as.numeric(mean_test_fav_kulaklik$favored_count))
@@ -557,7 +553,7 @@ for(i in seq(1,7,1)){
   kulaklik_sold_fav <- auto.arima(as.numeric(kulaklik_fav_start$sold_count), xreg = as.numeric(kulaklik_fav_head$favored_count))
   yarin_kulaklik_fav<- forecast(kulaklik_sold_fav, xreg = mean_fav_kulaklik) 
   
-
+  
   ziyaret_kulaklik<-tail(kulaklik,5)
   mean_test_basket_kulaklik<-head(ziyaret_kulaklik,3)
   mean_basket_kulaklik<-mean(as.numeric(mean_test_basket_kulaklik$basket_count))
@@ -644,7 +640,7 @@ for(i in seq(1,7,1)){
   
   supurge_sold_visit <- auto.arima(as.numeric(supurge_start$sold_count), xreg = as.numeric(supurge_start$visit_count))
   yarin_supurge_visit<- forecast(supurge_sold_visit, xreg = as.numeric(test_supurge$visit_count)) 
-
+  
   
   supurge_sold_price <- auto.arima(as.numeric(supurge_start$sold_count), xreg = as.numeric(supurge_start$price))
   yarin_supurge_price<- forecast(supurge_sold_price, xreg = as.numeric(test_supurge$price)) 
@@ -743,13 +739,13 @@ for(i in seq(1,7,1)){
   
   yuztemizleyici_sold_visit <- auto.arima(as.numeric(yuztemizleyici_test_duration$sold_count), xreg = as.numeric(yuztemizleyici_test_duration$visit_count))
   yarin_yuztemizleyici_visit<- forecast(yuztemizleyici_sold_visit, xreg = as.numeric(test_yuztemizleyici$visit_count)) 
-
   
-
+  
+  
   yuztemizleyici_sold_price <- auto.arima(as.numeric(yuztemizleyici_test_duration$sold_count), xreg = as.numeric(yuztemizleyici_test_duration$price))
   yarin_yuztemizleyici_price<- forecast(yuztemizleyici_sold_price, xreg = as.numeric(test_yuztemizleyici$price)) 
-
-
+  
+  
   ziyaret_yuztemizleyici<-tail(yuztemizleyici_test_duration,5)
   mean_test_fav_yuztemizleyici<-head(ziyaret_yuztemizleyici,3)
   mean_fav_yuztemizleyici<-mean(as.numeric(mean_test_fav_yuztemizleyici$favored_count))
@@ -772,12 +768,12 @@ for(i in seq(1,7,1)){
   
   yarin_yuztemizleyici <- 0.06 * yarin_yuztemizleyici_visit$mean[1]   +  0.04 * yarin_yuztemizleyici_price$mean[1] + 0.45 * yarin_yuztemizleyici_basket$mean[1] + 0.45 * yarin_yuztemizleyici_fav$mean[1]
   
-sum_mae <- sum_mae+ abs(as.numeric(test_data_yuztemizleyici$sold_count[i])-yarin_yuztemizleyici[1])
-mae_yuztemizleyici_arima<-sum_mae/7
-
-sum_mape <- sum_mape + (abs(as.numeric(test_data_yuztemizleyici$sold_count[i])-yarin_yuztemizleyici[1]) / as.numeric(test_data_yuztemizleyici$sold_count[i]))
-mape_yuztemizleyici_arima <- sum_mape/7 * 100
-
+  sum_mae <- sum_mae+ abs(as.numeric(test_data_yuztemizleyici$sold_count[i])-yarin_yuztemizleyici[1])
+  mae_yuztemizleyici_arima<-sum_mae/7
+  
+  sum_mape <- sum_mape + (abs(as.numeric(test_data_yuztemizleyici$sold_count[i])-yarin_yuztemizleyici[1]) / as.numeric(test_data_yuztemizleyici$sold_count[i]))
+  mape_yuztemizleyici_arima <- sum_mape/7 * 100
+  
 }
 
 
@@ -787,3 +783,53 @@ predictions[,forecast:=fc]
 
 send_submission(predictions, token, url=subm_url, submit_now=T)
 
+
+
+
+#decompose for tayt
+products = unique(data$product_content_id)
+
+tayt_d = data[product_content_id == products[1]]
+tayt_d = tayt_d[order(event_date)]
+#visit_count
+sold_tayt_d=zoo(tayt_d[,list(sold_count, visit_count, basket_count, favored_count)],tayt_d$event_date)
+plot(sold_tayt_d)
+
+#TREND - TAYT
+for_tayt = tayt_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_tayt = for_tayt[event_date > "2019-10-01"]
+for_tayt[,time_index:=1:.N]
+head(for_tayt)
+
+trend_tayt = lm(sold_count~time_index, data = for_tayt)
+#trend_tayt = lm(sold_count~time_index+visit_count, data = for_tayt)
+summary(trend_tayt)
+trend_tayt_component = trend_tayt$fitted
+for_tayt[,lr_trend:=trend_tayt_component]
+matplot(for_tayt[,list(sold_count, lr_trend)], type = "l")
+
+for_tayt[,detr_sc:=sold_count-lr_trend]
+detr_for_tayt = for_tayt[,list(detr_sc, event_date, time_index, price, visit_count, favored_count, basket_count)]
+
+y_tayt = ts(detr_for_tayt$detr_sc, freq = 7)
+plot(y_tayt)
+#trendsiz datanin forecasti
+fc_y_tayt = forecast(y_tayt,2)
+t_tayt = ts(for_tayt$lr_trend, freq = 7)
+#trendin forecasti
+fc_t_tayt = forecast(t_tayt,2)
+
+#1. sacma oldugu icin 2.gun forecasti alindi
+fc <- c((fc_y_tayt$mean[2]+fc_t_tayt$mean[2])*0,60)
+
+
+#SEASONALITY - TAYT - NO SEASONALITY
+#f_tayt=fourier(y_tayt, K=3)
+#str(f_tayt)
+#matplot(f_tayt[1:7,1:2],type='l')
+
+#fit_tayt=lm(y_tayt~f_tayt)
+#summary(fit_tayt)
+
+#deseason_tayt=y_tayt-coef(fit_tayt)[1]
+#plot(deseason_tayt[1:(7*2)],type='l')
