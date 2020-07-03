@@ -126,8 +126,8 @@ data = get_data(token=token,url=subm_url)
 
 products = unique(data$product_content_id)
 
-tayt = data[product_content_id == products[1]]
-tayt = tayt[order(event_date)]
+tayt_d = data[product_content_id == products[1]]
+tayt_d = tayt_d[order(event_date)]
 #visit_count
 #sold_tayt=zoo(tayt[,list(sold_count, visit_count, basket_count, favored_count)],tayt$event_date)
 #plot(sold_tayt)

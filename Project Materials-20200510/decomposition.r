@@ -126,64 +126,64 @@ data = get_data(token=token,url=subm_url)
 
 products = unique(data$product_content_id)
 
-tayt = data[product_content_id == products[1]]
-tayt = tayt[order(event_date)]
+tayt_d = data[product_content_id == products[1]]
+tayt_d = tayt_d[order(event_date)]
 #visit_count
-sold_tayt=zoo(tayt[,list(sold_count, visit_count, basket_count, favored_count)],tayt$event_date)
-plot(sold_tayt)
+sold_tayt_d=zoo(tayt_d[,list(sold_count, visit_count, basket_count, favored_count)],tayt_d$event_date)
+plot(sold_tayt_d)
 
 
-disfirca = data[product_content_id == products[2]]
-disfirca = disfirca[order(event_date)]
+disfirca_d = data[product_content_id == products[2]]
+disfirca_d = disfirca_d[order(event_date)]
 #visit_count & basket_count
-sold_disfirca=zoo(disfirca[,list(sold_count, visit_count, basket_count, favored_count)],disfirca$event_date)
-plot(sold_disfirca)
+sold_disfirca_d=zoo(disfirca_d[,list(sold_count, visit_count, basket_count, favored_count)],disfirca_d$event_date)
+plot(sold_disfirca_d)
 
 
-mont = data[product_content_id == products[3]]
-mont = mont[order(event_date)]
+mont_d = data[product_content_id == products[3]]
+mont_d = mont_d[order(event_date)]
 #visit_count | favored_count
-sold_mont=zoo(mont[,list(sold_count, visit_count, basket_count, favored_count)],mont$event_date)
-plot(sold_mont)
+sold_mont_d=zoo(mont_d[,list(sold_count, visit_count, basket_count, favored_count)],mont_d$event_date)
+plot(sold_mont_d)
 
 
-mendil = data[product_content_id == products[4]]
-mendil = mendil[order(event_date)]
+mendil_d = data[product_content_id == products[4]]
+mendil_d = mendil_d[order(event_date)]
 #visit_count
-sold_mendil=zoo(mendil[,list(sold_count, visit_count, basket_count, favored_count)],mendil$event_date)
-plot(sold_mendil)
+sold_mendil_d=zoo(mendil_d[,list(sold_count, visit_count, basket_count, favored_count)],mendil_d$event_date)
+plot(sold_mendil_d)
 
 
-bikini = data[product_content_id == products[5]]
-bikini = bikini[order(event_date)]
+bikini_d = data[product_content_id == products[5]]
+bikini_d = bikini_d[order(event_date)]
 #favored_count??
-sold_bikini=zoo(bikini[,list(sold_count, visit_count, basket_count, favored_count)],bikini$event_date)
-plot(sold_bikini)
+sold_bikini_d=zoo(bikini_d[,list(sold_count, visit_count, basket_count, favored_count)],bikini_d$event_date)
+plot(sold_bikini_d)
 
 
-kulaklik = data[product_content_id == products[6]]
-kulaklik = kulaklik[order(event_date)]
+kulaklik_d = data[product_content_id == products[6]]
+kulaklik_d = kulaklik_d[order(event_date)]
 #visit_count & (?)favored_count
-sold_kulaklik=zoo(kulaklik[,list(sold_count, visit_count, basket_count, favored_count)],kulaklik$event_date)
-plot(sold_kulaklik)
+sold_kulaklik_d=zoo(kulaklik_d[,list(sold_count, visit_count, basket_count, favored_count)],kulaklik_d$event_date)
+plot(sold_kulaklik_d)
 
 
-supurge = data[product_content_id == products[7]]
-supurge = supurge[order(event_date)]
+supurge_d = data[product_content_id == products[7]]
+supurge_d = supurge_d[order(event_date)]
 #basket_count + visit_cpunt ??
-sold_supurge=zoo(supurge[,list(sold_count, visit_count, basket_count, favored_count)],supurge$event_date)
-plot(sold_supurge)
+sold_supurge_d=zoo(supurge_d[,list(sold_count, visit_count, basket_count, favored_count)],supurge_d$event_date)
+plot(sold_supurge_d)
 
 
-yuztemizleyici = data[product_content_id == products[8]]
-yuztemizleyici = yuztemizleyici[order(event_date)]
+yuztemizleyici_d = data[product_content_id == products[8]]
+yuztemizleyici_d = yuztemizleyici_d[order(event_date)]
 #visit_count + basket_count ??
-sold_yuztemizleyici=zoo(yuztemizleyici[,list(sold_count, visit_count, basket_count, favored_count)],yuztemizleyici$event_date)
-plot(sold_yuztemizleyici)
+sold_yuztemizleyici_d=zoo(yuztemizleyici_d[,list(sold_count, visit_count, basket_count, favored_count)],yuztemizleyici_d$event_date)
+plot(sold_yuztemizleyici_d)
 
 
 #TREND - TAYT
-for_tayt = tayt[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_tayt = tayt_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_tayt = for_tayt[event_date > "2019-10-01"]
 for_tayt[,time_index:=1:.N]
 head(for_tayt)
@@ -223,7 +223,7 @@ fc <- c(fc_y_tayt$mean[2]+fc_t_tayt$mean[2])
 
 #######################
 #TREND - DISFIRCA
-for_disfirca = disfirca[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_disfirca = disfirca_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_disfirca = for_disfirca[event_date > "2019-12-01"]
 for_disfirca[,time_index:=1:.N]
 #head(for_disfirca)
@@ -258,7 +258,7 @@ fc <- c(fc, (fc_y_disfirca$mean[2]+fc_t_disfirca$mean[2]))
 
 #######################
 #TREND - MONT - NO TREND
-for_mont = mont[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_mont = mont_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_mont[,time_index:=1:.N]
 #head(for_mont)
 
@@ -287,7 +287,7 @@ fc <- c(fc, max(0,fc_y_mont_deseas$mean[2]))
 
 #######################
 #TREND - MENDIL - NO TREND
-for_mendil = mendil[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_mendil = mendil_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_mendil = for_mendil[event_date > "2019-09-10"]
 for_mendil[,time_index:=1:.N]
 #head(for_mendil)
@@ -312,7 +312,7 @@ fc <- c(fc, fc_y_mendil$mean[2])
 
 #######################
 #TREND - BIKINI - ??? NO TREND OLMASI MANTIKLI
-for_bikini = bikini[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_bikini = bikini_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_bikini[,time_index:=1:.N]
 #head(for_bikini)
 
@@ -340,7 +340,7 @@ fc <- c(fc, max(0,fc_y_bikini_deseas$mean[2]))
 
 #######################
 #TREND - KULAKLIK
-for_kulaklik = kulaklik[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_kulaklik = kulaklik_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_kulaklik = for_kulaklik[event_date > "2019-06-20"]
 for_kulaklik[,time_index:=1:.N]
 #head(for_kulaklik)
@@ -374,7 +374,7 @@ fc <- c(fc, (fc_y_kulaklik$mean[2] + fc_t_kulaklik$mean[2]))
 
 #######################
 #TREND - SUPURGE
-for_supurge = supurge[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_supurge = supurge_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_supurge = for_supurge[event_date > "2019-07-25"]
 for_supurge[,time_index:=1:.N]
 #head(for_supurge)
@@ -410,7 +410,7 @@ fc <- c(fc, (fc_y_supurge$mean[2]+fc_t_supurge$mean[2]))
 
 #######################
 #TREND - YUZTEMIZLEYICI
-for_yuztemizleyici = yuztemizleyici[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
+for_yuztemizleyici = yuztemizleyici_d[,list(sold_count, event_date, price, visit_count, favored_count, basket_count)]
 for_yuztemizleyici[,time_index:=1:.N]
 #head(for_yuztemizleyici)
 
