@@ -1,3 +1,96 @@
+---
+title: "IE360 Project/Group6"
+author: "Barış Can Okur, Furkan Efe, Pelinsu Yılmaz, Zeynep Sezer"
+date: "7/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+```
+
+## Introduction
+
+  In the last decade, e-commerce is growing at an extraordinary pace. Trendyol is the most rapidly growing e-commerce platform in Turkey. Each day, they are selling thousands of products from different brands and categories. The environment of e-commerce is really agile and one should be able to predict the consumer behavior and act accordingly. The nature of e-commerce relies on being data-driven, and Trendyol is working on observing the available data in e-commerce and making remarkable predictions about the future. It is not easy to imagine how many active users Trendyol has, and how many transactions there are just in one day. In order to manage this complexity, Trendyol has to constantly analyse their data and make predictions for the future. In this project, a forecasting method will be developed in order to make reliable predictions for the sales of eight different products. These predictions might be dependent on many factors such as pricing, basket count, favorite count. The project is a real time project and the forecasts are done each day for the next day’s sales quantity. The forecasts should be reliable in order to avoid opportunity losses and provide customer satisfaction. Therefore, the forecast model will be formed by analyzing the past data deeply for each product separately. 
+
+  As discussed above, there are eight products to be forecasted and each are from different categorical levels, brands and site levels. In Table 1, the list of products that will be predicted and their hierarchical details can be found.
+```{r, echo=FALSE}
+img1 <- readPNG('/Users/furkanefe/Desktop/ss.png')
+grid::grid.raster(img1)
+```
+
+The data set provided by Trendyol includes all information regarding these products: sales quantity, price, favored counts, basket count etc. This data is updated on a daily basis, so each day, the last day’s data becomes available for more accurate forecasting. In the data set some information is missing which might lead to redundant variations for the data. Data manipulation is done in order to avoid such variations. 
+
+## Literature Review
+
+  Product demand forecasting has been done in many different ways in the literature. The simplest way is time series regression models. Time series regression model is predicting the future of a time series based on another time series. yt is the forecast variable and xtis the predictor variable.
+  
+```{r, echo=FALSE}
+img3 <- readPNG('/Users/furkanefe/Desktop/R1.png')
+grid::grid.raster(img3)
+```
+ 
+  Time Series decomposition is another approach to product forecasting. The patterns such as seasonality, trends and cycles are decomposed from the data. The forecast is done separately for each component and then summed up for the final product forecast. yt is the forecast variable, St is the seasonality component, Tt is the trend component and the remaining component is called Rt. 
+  
+```{r, echo=FALSE}
+img2 <- readPNG('/Users/furkanefe/Desktop/R2.png')
+grid::grid.raster(img2)
+```
+  
+  Another forecasting method is exponential smoothing. This method uses the weighted average of the last observations, recent ones having more weight. This method is widely used and quick to generate forecasts. 
+  
+  ARIMA model is another commonly used forecasting method. ARIMA models focus on the explanation of the autocorrelations in the data. Arima models are formed based on lagged observations and lagged errors of the past data. In order to use the arima model, the series must be stationary. 
+  
+  Lastly,  if the forecasting is done at a higher hierarchical level, not at the SKU level, hierarchical forecasting can be used.  This approach can be applied in three different ways:  top-down approach, bottom-up approach, middle-out approach. As the names suggest, in the top-down approach first the forecast for the highest level is done and branched down into SKU level. In the bottom-up approach, the forecast is done in SKU level, then generalized to the highest hierarchical level. For the middle-out approach, a middle level is specified and for the levels below middle level top-down approach, for the ones above bottom-up approach are used. 
+
+## Approach
+
+  In this project, we mainly used two different approaches to forecast Trendyol’s sales for 8 different products in different categories. The two main methods are decomposition and ARIMA models.
+
+#### 1) ARIMA Models
+
+  Before applying ARIMA models to predict future sales, we needed to first split the data into different products and create eight different xts objects for each product so that working with these xts objects are much more comfortable than data.frame objects. Then, cleaning the data is necessary because the data has many missed entries. Manipulating data for price was also needed to improve the ARIMA model using price as a regressor, so price was changed as the mean of the prices of 1 day ago and 1 day later. Afterwards, we separated each product data into parts so that we can train and test our model on different parts. We used different ARIMA models to forecast different product sales. All models were checked for residuals to have no high autocorrelation and to be normally distributed. In addition, we have tried many different ARIMA models to forecast one product and compared their AICc values to see which model is a better fit more than others. Also, we have added different regressors separately such as price, basket count, favored count, visit count to our ARIMA models to predict sales of the future. Changing the extent of the regressors such as giving the regressor of the favored count of the mean of the last 3 to 5 days decreased the AICc values of the ARIMA models. However, these regressors don’t always improve the forecasts, so the trial and error method was used to decide whether to include those into the model or not. Ensembling different ARIMA models were at the table for better predictions. We gave weights for different models to combine them into a new ensembled model. We decided the weight of the models by comparing their test results. We also calculated the MAPE and MAE values on the test sets to improve our comparison between different models.
+
+#### 2) Decomposition of Trend and Seasonality
+
+  Decomposing seasonality and trend from the original data set, then forecasting the 3 components separately is our second approach. Differently from the first approach, the separated data for each product is converted into a data.table object. We look for the best decomposition method and according to the AICcs values generally additive decomposition method succeeded better than multiplicative one. We used Linear Regression to extract trends from the data set, also Fourier series used to extract and predict the seasonality. Similarly we compute the test results and values of MAPE and MAE. 
+  
+  In the last phase of the project, according to the MAPE values of the test results, we gave weights to each approach and combined them to predict sales better. So, the final prediction is an ensemble of decomposition and arima model with certain weights.
+
+## Results
+
+  The forecast is consistent for the products that are not affected either by sales price or the season such as the face cleanser and leggings. However the forecast for products such as vacuum cleaners or headphones are less accurate due to changing technology trends, advertising trends and exchange rates. As discussed earlier since these effects are not taken into account, the mean absolute error is higher. 
+
+  For products like coats and bikinis since they have strong seasonality on yearly basis the forecast was mostly zero. The live forecasting took place in early spring so it is logical to not have demand for those products in the given period. We have not computed the mean absolute percentage error because mean absolute percentages for both products were infinite. Mean absolute errors were already really low, therefore they were not suitable for comparison. Therefore, we focused more on the other products with more fluctuating demands. 
+
+  As observed from the data, e-commerce sales are not easy to interpret rather they are complicated. There are so many factors affecting online sales including social media promotions. In this project we were limited with some major effects however the real life is much more complicated. It was not possible to fully demonstrate the fluctuating demand with the generated model. Even though we have tried to reduce the mean absolute percentage error, it was still not sufficient to form the perfect model. 
+
+  It is believed that if our model is run for a long time, then the weights of the two models can be adjusted better and the fluctuating demand may be forecasted in a more precise way. Also, forecasting the sales with our model and keeping forecast errors would be beneficial in the long run.
+
+## Conclusion and Future Work
+
+  As can be seen in the literature review, there are many approaches to forecasting a products’ demand. In our approach, we tried to combine these different methods to come up with the best forecast. However, it is still a fact that modeling the real world is not easy since there are many factors affecting each situation.
+
+  To improve our forecasting model, we can incorporate some external factors using different data sources. For example, for vacuum cleaners and headphones, we can add a Google trends data to see the trend for these categories. Since these products are mostly imported from other countries, the currency rates can also be added as regressors. Also, in the technology category another thing to be aware of is the new launches. If there is a new generation of the same product, we might expect the sales to go down. 
+
+  In the clothing category, since Trendyol is well-known for its influencer marketing on social media, that can also be incorporated into our model. For example, we could analyze the data of the products that were advertised by the influencers and how it affected the sales, then we could add that effect to our model (if the product is advertised in the given period). 
+
+  It is not possible to model the real world completely, however with the right weights to each effect, the model can become more realistic and reliable. 
+
+## References
+Hyndman, Rob J. “Forecasting in R.” DataCamp, <http://learn.datacamp.com/courses/forecasting-in-r>.
+
+LaBarr, Aric. “Forecasting Product Demand in R.” DataCamp, <http://learn.datacamp.com/courses/forecasting-product-demand-in->.
+
+Hyndman , Rob J, and George Athanasopoulos. “Forecasting: Principles and Practice.” Otexts, <http://otexts.com/fpp2/MA.html>.
+
+## Code
+
+Here is our code. 
+
+```{r, eval=FALSE}
 # install the required packages first
 
 require(jsonlite)
@@ -146,7 +239,6 @@ checkresiduals(tayt_sold_visit)
 
 yarin_tayt_visit<-forecast(tayt_sold_visit,xreg=as.numeric(test_tayt$visit_count))
 summary(yarin_tayt_visit)
-autoplot(yarin_tayt_visit)
 
 #regressor is the mean of basket of 3-5 days 
 ziyaret_tayt<-tail(tayt,5)
@@ -1371,3 +1463,5 @@ predictions[,forecast:=fc]
 
 send_submission(predictions, token, url=subm_url, submit_now=F)
 
+
+```
